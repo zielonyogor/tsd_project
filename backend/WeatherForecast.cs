@@ -1,4 +1,4 @@
-namespace backend
+namespace SprintTracker
 {
     public class WeatherForecast
     {
