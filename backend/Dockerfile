@@ -23,6 +23,16 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./backend.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+# Development stage for hot reload
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS dev
+WORKDIR /src
+COPY ["backend/backend.csproj", "backend/"]
+RUN dotnet restore "./backend/backend.csproj"
+COPY . .
+WORKDIR "/src/backend"
+EXPOSE 8080
+CMD ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:8080"]
+
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
