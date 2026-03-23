@@ -1,0 +1,78 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.title {
+    padding-left: 20px;
+    padding-bottom: 10px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sprint-container {
+    padding: 0 40px;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sprint-list {
+    display: flex;
+    gap: 20px;
+    background-color: #e8f1fa;
+    box-shadow: 0 8px 8px rgba(0, 0, 0, 0.2);
+    padding: 40px;
+    max-width: 90vw;
+    overflow-x: auto;
+    flex-wrap: nowrap; 
+    scroll-behavior: smooth;
+
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 999px;
+        transition: background 0.2s ease;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.4);
+    }
+}
+
+.sprint-card {
+    padding: 20px;
+    background-color: #c9ddf8 ;
+    border-radius: 8px;
+    min-height: 120px;
+    flex: 0 0 200px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #b0d0f5;
+    }
+
+    h2 {
+        font-weight: bold;
+    }
+
+    p {
+        color: #484c58;
+    }
+}
+
+.sprint-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        background-color: #b0d0f5;
+    }
+}
