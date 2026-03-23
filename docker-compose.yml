@@ -1,13 +1,20 @@
 ﻿services:
   backend:
-    # maybe investigate why it works only like that?
     build:
       context: .
       dockerfile: backend/Dockerfile
+      target: dev
     ports:
       - "8080:8080"
     environment:
       - ASPNETCORE_URLS=http://+:8080
+    volumes:
+      - ./backend:/src/backend
+      - /src/backend/bin
+      - /src/backend/obj
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
     build: ./frontend
@@ -18,3 +25,20 @@
       - /app/node_modules
     depends_on:
       - backend
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+volumes:
+  postgres_data:
