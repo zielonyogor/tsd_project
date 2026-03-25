@@ -19,4 +19,10 @@ describe('Home', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should render sprint cards', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const sprintCards = compiled.querySelectorAll('.sprint-card');
+    expect(sprintCards.length).toBeGreaterThan(0);
+  });
 });

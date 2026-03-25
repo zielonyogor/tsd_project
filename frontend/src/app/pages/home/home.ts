@@ -9,7 +9,7 @@ import type { Sprint } from '../../../types/sprint';
   imports: [DatePipe],
 })
 export class Home {
-  protected readonly sprints: Array<Sprint> = [
+  protected readonly sprints: Sprint[] = [
     {
       id: '1',
       goal: 'Make MVP',

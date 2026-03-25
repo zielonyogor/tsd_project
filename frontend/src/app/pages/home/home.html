@@ -3,13 +3,13 @@
 <div class="sprint-container">
   <div class="sprint-list">
     @for (s of sprints; track s.id) {
-      <div class="sprint-card" (click)="goToSprint(s.id)">
+      <button class="sprint-card" (click)="goToSprint(s.id)">
         <h2>{{s.goal}}</h2>
         <p>{{s.startDate | date}} - {{s.endDate | date}}</p>
-      </div>
+      </button>
     }
-    <div class="sprint-card sprint-add-btn" (click)="addSprint()">
+    <button class="sprint-card sprint-add-btn" (click)="addSprint()">
       <h2>+ Add Sprint</h2>
-    </div>
+    </button>
   </div>
 </div>

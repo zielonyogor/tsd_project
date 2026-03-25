@@ -38,7 +38,6 @@
     }
     &::-webkit-scrollbar-thumb {
         background: rgba(0, 0, 0, 0.2);
-        border-radius: 999px;
         transition: background 0.2s ease;
     }
     &::-webkit-scrollbar-thumb:hover {
@@ -47,15 +46,24 @@
 }
 
 .sprint-card {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    appearance: none;
+
     padding: 20px;
-    background-color: #c9ddf8 ;
-    border-radius: 8px;
+    background-color: #b4d3fa ;
     min-height: 120px;
     flex: 0 0 200px;
     cursor: pointer;
 
     &:hover {
-        background-color: #b0d0f5;
+        background-color: #a5cbf7;
     }
 
     h2 {
