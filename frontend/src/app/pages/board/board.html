@@ -1,1 +1,36 @@
-<p>board works!</p>
+<h1 class="title">Sprint Board <span class="sprint-time">{{ sprint.startDate | date:'shortDate' }} - {{ sprint.endDate | date:'shortDate' }}</span></h1>
+<h2 class="sprint-goal">Sprint Goal: {{ sprint.goal }}</h2>
+
+<div class="sprint-board">
+   <div class="sprint-column">
+      <h2>To Do</h2>
+      <div class="user-story">
+         @for (story of getUserStoriesForColumn('In Progress'); track story.id) {
+             <h3>{{ story.title }}</h3>
+             <p>{{ story.description }}</p>
+        }
+      </div>
+   </div>
+    <div class="sprint-column">
+        <h2>In Progress</h2>
+        <div class="user-story" *ngFor="let story of userStories.filter(s => s.status === 'In Progress')">
+            <h3>{{ story.title }}</h3>
+            <p>{{ story.description }}</p>
+        </div>
+    </div>
+    <div class="sprint-column">
+        <h2>Code Review</h2>
+        <div class="user-story" *ngFor="let story of userStories.filter(s => s.status === 'Code Review')">
+            <h3>{{ story.title }}</h3>
+            <p>{{ story.description }}</p>
+        </div>
+
+    </div>
+    <div class="sprint-column">
+        <h2>Done</h2>
+        <div class="user-story" *ngFor="let story of userStories.filter(s => s.status === 'Done')">
+            <h3>{{ story.title }}</h3>
+            <p>{{ story.description }}</p>
+        </div>
+    </div>
+</div>
