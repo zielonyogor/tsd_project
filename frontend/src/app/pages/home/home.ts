@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import type { Sprint } from '../../../types/sprint';
+import { Router } from '@angular/router';
+import { FAKE_SPRINTS } from '../../data/fake-sprint-boards';
 
 @Component({
   selector: 'app-home',
@@ -9,41 +10,12 @@ import type { Sprint } from '../../../types/sprint';
   imports: [DatePipe],
 })
 export class Home {
-  protected readonly sprints: Sprint[] = [
-    {
-      id: '1',
-      goal: 'Make MVP',
-      startDate: new Date(2026, 1, 1),
-      endDate: new Date(2026, 1, 22)
-    },
-    {
-      id: '2',
-      goal: 'Improve UI',
-      startDate: new Date(2026, 1, 23),
-      endDate: new Date(2026, 2, 5)
-    },
-    {
-      id: '2',
-      goal: 'Improve UI',
-      startDate: new Date(2026, 1, 23),
-      endDate: new Date(2026, 2, 5)
-    },
-    {
-      id: '2',
-      goal: 'Improve UI',
-      startDate: new Date(2026, 1, 23),
-      endDate: new Date(2026, 2, 5)
-    },
-    {
-      id: '2',
-      goal: 'Improve UI',
-      startDate: new Date(2026, 1, 23),
-      endDate: new Date(2026, 2, 5)
-    }
-  ];
+  protected readonly sprints = FAKE_SPRINTS;
+
+  constructor(private readonly router: Router) {}
 
   goToSprint(sprintId: string): void {
-    console.log(`Navigating to sprint with ID: ${sprintId}`);
+    void this.router.navigate(['/board', sprintId]);
   }
 
   addSprint(): void {
