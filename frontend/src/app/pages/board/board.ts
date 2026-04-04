@@ -42,6 +42,11 @@ export class Board implements OnInit {
     console.log('Open user story', story.id);
   }
 
+  protected onAddStory(): void {
+    // Open add user story modal here
+    console.log('Add new user story to sprint', this.sprint.id);
+  }
+
   private loadBoard(boardId: string): boolean {
     const boardData = FAKE_SPRINT_BOARDS[boardId];
 
