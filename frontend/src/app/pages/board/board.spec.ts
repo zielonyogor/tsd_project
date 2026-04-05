@@ -49,8 +49,8 @@ describe('Board', () => {
   });
 
   it('loads sprint data from the route param id', () => {
-    expect((component as any).sprint).toEqual(FAKE_SPRINT_BOARDS['1'].sprint);
-    expect((component as any).getUserStoriesForColumn('To Do')).toEqual([
+    expect(component.sprint).toEqual(FAKE_SPRINT_BOARDS['1'].sprint);
+    expect(component.getUserStoriesForColumn('To Do')).toEqual([
       FAKE_SPRINT_BOARDS['1'].userStories[0],
     ]);
     expect(navigateCalls).toEqual([]);

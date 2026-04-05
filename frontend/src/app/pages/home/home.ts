@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FAKE_SPRINTS } from '../../data/fake-sprint-boards';
@@ -11,8 +11,7 @@ import { FAKE_SPRINTS } from '../../data/fake-sprint-boards';
 })
 export class Home {
   protected readonly sprints = FAKE_SPRINTS;
-
-  constructor(private readonly router: Router) {}
+  private readonly router = inject(Router);
 
   goToSprint(sprintId: string): void {
     void this.router.navigate(['/board', sprintId]);

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import type { Sprint } from '../../../types/sprint';
@@ -15,13 +15,11 @@ import { FAKE_SPRINT_BOARDS } from '../../data/fake-sprint-boards';
 export class Board implements OnInit {
   protected readonly columns = USER_STORY_STATUSES;
 
-  protected sprint!: Sprint;
+  public sprint!: Sprint;
   private userStories: UserStory[] = [];
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
-  ) {}
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(paramMap => {
@@ -33,7 +31,7 @@ export class Board implements OnInit {
     });
   }
 
-  protected getUserStoriesForColumn(status: UserStoryStatus): UserStory[] {
+  public getUserStoriesForColumn(status: UserStoryStatus): UserStory[] {
     return this.userStories.filter(story => story.status === status);
   }
 
