@@ -3,13 +3,107 @@
 <div class="sprint-container">
   <div class="sprint-list">
     @for (s of sprints; track s.id) {
-      <button class="sprint-card" (click)="goToSprint(s.id)">
-        <h2>{{s.goal}}</h2>
-        <p>{{s.startDate | date}} - {{s.endDate | date}}</p>
-      </button>
+      <article class="sprint-card">
+        @if (editingSprintId === s.id) {
+          <label class="field-label" for="goal-{{ s.id }}">Sprint goal</label>
+          <input
+            id="goal-{{ s.id }}"
+            type="text"
+            class="field-input"
+            [(ngModel)]="editingGoal"
+          />
+
+          <label class="field-label" for="start-date-{{ s.id }}">Start date</label>
+          <input
+            id="start-date-{{ s.id }}"
+            type="date"
+            class="field-input"
+            [(ngModel)]="editingStartDate"
+          />
+
+          <label class="field-label" for="end-date-{{ s.id }}">End date</label>
+          <input
+            id="end-date-{{ s.id }}"
+            type="date"
+            class="field-input"
+            [(ngModel)]="editingEndDate"
+          />
+
+          @if (editSprintError) {
+            <p class="error-msg">{{ editSprintError }}</p>
+          }
+          <div class="actions-row">
+            <button class="card-action-btn" type="button" (click)="saveGoal(s)">Save goal</button>
+            <button class="card-action-btn muted" type="button" (click)="cancelEditingGoal()">Cancel</button>
+          </div>
+        } @else {
+          <button class="sprint-open-btn" type="button" (click)="goToSprint(s.id)">
+            <h2>{{ s.goal }}</h2>
+            <p>{{ s.startDate | date }} - {{ s.endDate | date }}</p>
+          </button>
+          <button class="card-action-btn" type="button" (click)="startEditingGoal(s)">Edit goal</button>
+        }
+      </article>
     }
-    <button class="sprint-card sprint-add-btn" (click)="addSprint()">
+    <button class="sprint-card sprint-add-btn" type="button" (click)="addSprint()">
       <h2>+ Add Sprint</h2>
     </button>
   </div>
 </div>
+
+@if (isCreatingSprint) {
+  <div class="create-modal-backdrop" (click)="cancelSprintCreation()">
+    <section
+      class="create-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="create-sprint-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="create-modal-header">
+        <h2 id="create-sprint-title">Create sprint</h2>
+        <button class="icon-close-btn" type="button" aria-label="Close create sprint form" (click)="cancelSprintCreation()">
+          ×
+        </button>
+      </div>
+
+      <form class="create-form" (ngSubmit)="createSprint()">
+        <label class="field-label" for="new-title">Sprint title</label>
+        <input
+          id="new-title"
+          type="text"
+          class="field-input"
+          [(ngModel)]="newSprintForm.title"
+          name="title"
+        />
+
+        <label class="field-label" for="new-start-date">Start date</label>
+        <input
+          id="new-start-date"
+          type="date"
+          class="field-input"
+          [(ngModel)]="newSprintForm.startDate"
+          name="startDate"
+        />
+
+        <label class="field-label" for="new-end-date">End date</label>
+        <input
+          id="new-end-date"
+          type="date"
+          class="field-input"
+          [(ngModel)]="newSprintForm.endDate"
+          name="endDate"
+        />
+
+        @if (createError) {
+          <p class="error-msg">{{ createError }}</p>
+        }
+
+        <div class="actions-row">
+          <button class="card-action-btn" type="submit">Create sprint</button>
+          <button class="card-action-btn muted" type="button" (click)="cancelSprintCreation()">Cancel</button>
+        </div>
+      </form>
+    </section>
+  </div>
+}
