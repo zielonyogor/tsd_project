@@ -130,7 +130,7 @@ describe('Board', () => {
     board.editStoryForm.status = 'Blocked';
     board.saveStory();
 
-    expect(board.isEditingStory).toBeFalse();
+    expect(board.isEditingStory).toBe(false);
     expect(board.editStoryError).toBe('');
     expect(component.getUserStoriesForColumn('Blocked')).toContain(story);
     expect(story.title).toBe('Updated story title');
@@ -156,7 +156,7 @@ describe('Board', () => {
     board.createStory();
 
     expect(board.createStoryError).toBe('Please provide user story title and description.');
-    expect(board.isCreatingStory).toBeTrue();
+    expect(board.isCreatingStory).toBe(true);
   });
 
   it('shows validation error when saving an edited user story without required fields', () => {
@@ -178,6 +178,6 @@ describe('Board', () => {
     board.saveStory();
 
     expect(board.editStoryError).toBe('Please provide user story title and description.');
-    expect(board.isEditingStory).toBeTrue();
+    expect(board.isEditingStory).toBe(true);
   });
 });
