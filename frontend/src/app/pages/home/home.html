@@ -52,13 +52,17 @@
 </div>
 
 @if (isCreatingSprint) {
-  <div class="create-modal-backdrop" (click)="cancelSprintCreation()">
+  <div
+    class="create-modal-backdrop"
+    tabindex="0"
+    (click)="onBackdropClick($event)"
+    (keyup.enter)="cancelSprintCreation()"
+  >
     <section
       class="create-modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="create-sprint-title"
-      (click)="$event.stopPropagation()"
     >
       <div class="create-modal-header">
         <h2 id="create-sprint-title">Create sprint</h2>

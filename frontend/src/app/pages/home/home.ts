@@ -46,6 +46,12 @@ export class Home {
     this.createError = '';
   }
 
+  onBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.cancelSprintCreation();
+    }
+  }
+
   createSprint(): void {
     const title = this.newSprintForm.title.trim();
     const startDate = this.parseDate(this.newSprintForm.startDate);
