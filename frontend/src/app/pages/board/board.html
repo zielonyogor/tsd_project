@@ -19,3 +19,135 @@
     </div>
   }
 </div>
+
+@if (isCreatingStory) {
+    <div
+        class="create-modal-backdrop"
+        role="button"
+        tabindex="0"
+        (click)="onBackdropClick($event)"
+        (keydown.enter)="onBackdropClick($event)"
+        (keydown.space)="onBackdropClick($event); $event.preventDefault()"
+    >
+        <section
+            class="create-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-story-title"
+        >
+            <div class="create-modal-header">
+                <h2 id="create-story-title">Create user story</h2>
+                <button class="icon-close-btn" type="button" aria-label="Close create user story form" (click)="cancelStoryCreation()">
+                    x
+                </button>
+            </div>
+
+            <form class="create-form" (ngSubmit)="createStory()">
+                <label class="field-label" for="new-story-title">Title</label>
+                <input
+                    id="new-story-title"
+                    type="text"
+                    class="field-input"
+                    [(ngModel)]="newStoryForm.title"
+                    name="title"
+                />
+
+                <label class="field-label" for="new-story-description">Description</label>
+                <textarea
+                    id="new-story-description"
+                    class="field-input"
+                    rows="4"
+                    [(ngModel)]="newStoryForm.description"
+                    name="description"
+                ></textarea>
+
+                <label class="field-label" for="new-story-status">Status</label>
+                <select
+                    id="new-story-status"
+                    class="field-input"
+                    [(ngModel)]="newStoryForm.status"
+                    name="status"
+                >
+                    @for (status of columns; track status) {
+                        <option [value]="status">{{ status }}</option>
+                    }
+                </select>
+
+                @if (createStoryError) {
+                    <p class="error-msg">{{ createStoryError }}</p>
+                }
+
+                <div class="actions-row">
+                    <button class="card-action-btn" type="submit">Create story</button>
+                    <button class="card-action-btn muted" type="button" (click)="cancelStoryCreation()">Cancel</button>
+                </div>
+            </form>
+        </section>
+    </div>
+}
+
+@if (isEditingStory) {
+    <div
+        class="create-modal-backdrop"
+        role="button"
+        tabindex="0"
+        (click)="onBackdropClick($event)"
+        (keydown.enter)="onBackdropClick($event)"
+        (keydown.space)="onBackdropClick($event); $event.preventDefault()"
+    >
+        <section
+            class="create-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-story-title"
+        >
+            <div class="create-modal-header">
+                <h2 id="edit-story-title">Edit user story</h2>
+                <button class="icon-close-btn" type="button" aria-label="Close edit user story form" (click)="cancelStoryEditing()">
+                    x
+                </button>
+            </div>
+
+            <form class="create-form" (ngSubmit)="saveStory()">
+                <label class="field-label" for="edit-story-title-input">Title</label>
+                <input
+                    id="edit-story-title-input"
+                    type="text"
+                    class="field-input"
+                    [(ngModel)]="editStoryForm.title"
+                    name="editTitle"
+                />
+
+                <label class="field-label" for="edit-story-description">Description</label>
+                <textarea
+                    id="edit-story-description"
+                    class="field-input"
+                    rows="4"
+                    [(ngModel)]="editStoryForm.description"
+                    name="editDescription"
+                ></textarea>
+
+                <label class="field-label" for="edit-story-status">Status</label>
+                <select
+                    id="edit-story-status"
+                    class="field-input"
+                    [(ngModel)]="editStoryForm.status"
+                    name="editStatus"
+                >
+                    @for (status of columns; track status) {
+                        <option [value]="status">{{ status }}</option>
+                    }
+                </select>
+
+                @if (editStoryError) {
+                    <p class="error-msg">{{ editStoryError }}</p>
+                }
+
+                <div class="actions-row">
+                    <button class="card-action-btn" type="submit">Save story</button>
+                    <button class="card-action-btn muted" type="button" (click)="cancelStoryEditing()">Cancel</button>
+                </div>
+            </form>
+        </section>
+    </div>
+}
