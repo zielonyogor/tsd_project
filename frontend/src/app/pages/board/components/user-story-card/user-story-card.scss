@@ -1,0 +1,27 @@
+.user-story-card {
+  border: 1px solid #d8d8d8;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 0.75rem;
+  cursor: pointer;
+}
+
+.user-story-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.user-story-card p {
+  margin: 0.5rem 0 0;
+  color: #525252;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.user-story-card:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}

@@ -1,1 +1,21 @@
-<p>board works!</p>
+<div class="bar-container">
+    <div class="bar-title">
+        <h1 class="title">Sprint Board <span class="sprint-time">{{ sprint.startDate | date:'shortDate' }} - {{ sprint.endDate | date:'shortDate' }}</span></h1>
+        <h2 class="sprint-goal">Sprint Goal: {{ sprint.goal }}</h2>
+    </div>
+    
+    <button class="add-btn" (click)="onAddStory()">+ Add User Story</button>
+</div>
+
+<div class="sprint-board">
+  @for (column of columns; track column) {
+    <div class="sprint-column">
+        <h2>{{ column }}</h2>
+        <div class="user-story-list">
+            @for (story of getUserStoriesForColumn(column); track story.id) {
+                <app-user-story-card [story]="story" (openStory)="onOpenStory($event)"></app-user-story-card>
+            }
+        </div>
+    </div>
+  }
+</div>

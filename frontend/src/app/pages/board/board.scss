@@ -1,0 +1,63 @@
+.sprint-board {
+	margin: 20px;
+	display: grid;
+	grid-template-columns: repeat(5, minmax(240px, 1fr));
+	gap: 1rem;
+	background-color: #b4d3fa;
+	padding: 10px;
+	overflow-x: auto;
+}
+
+.sprint-column {
+	background: #e8f1fa;
+	padding: 0.75rem;
+    min-height: 300px;
+}
+
+.sprint-column h2 {
+	margin-top: 0;
+    color: #484c58;
+}
+
+.user-story-list {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.add-btn {
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px;
+
+  .bar-title {
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .sprint-time {
+      font-size: 0.875rem;
+      color: #525252;
+    }
+
+    .sprint-goal {
+      margin: 0.25rem 0 0;
+      font-size: 1rem;
+      color: #484c58;
+    }
+  }
+}
