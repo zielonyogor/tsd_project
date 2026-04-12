@@ -21,6 +21,8 @@ export class Board implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
+  public isProgressOpen = false;
+
   ngOnInit(): void {
     this.route.paramMap.subscribe(paramMap => {
       const boardId = paramMap.get('id');
@@ -58,6 +60,40 @@ export class Board implements OnInit {
     return true;
   }
 
+  public toggleProgressDisplay(): void {
+    this.isProgressOpen = (!this.isProgressOpen) && (this.userStories.length > 0);
+  }
+
+  public getStatusProgress() {
+    const total = this.userStories.length || 1;
+    return this.columns.map(status => {
+      const count = this.userStories.filter(story => story.status === status).length;
+      return {
+        status,
+        count,
+        color: this.getColorForStatus(status),
+        width: (count / total) * 100
+      };
+    }).filter(itm => itm.count > 0);
+  }
+
+  private getColorForStatus(status: string) {
+    switch(status) {
+      case "To Do":
+        return "#757575";
+      case "Blocked":
+        return "#f44336";
+      case "In Progress":
+        return "#2196f3";
+      case "Code Review":
+        return "#ff9800";
+      case "Done":
+        return "#4caf50";
+      default:
+        return "#202020";
+    }
+  }
+
   public getUserStoriesProgress(): number[] {
     return this.columns.map(status => this.userStories.filter(story => story.status === status).length);
   }
@@ -66,7 +102,7 @@ export class Board implements OnInit {
     const counts = this.getUserStoriesProgress();
     const idx = USER_STORY_STATUSES.indexOf("Done");
     
-    if (idx === -1) {
+    if (idx === -1 || this.userStories.length === 0) {
       return 0;
     }
 
