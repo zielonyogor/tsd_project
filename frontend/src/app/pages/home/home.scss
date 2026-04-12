@@ -21,32 +21,33 @@
 }
 
 .sprint-list {
-    display: flex;
-    gap: 20px;
-    background-color: #e8f1fa;
-    box-shadow: 0 8px 8px rgba(0, 0, 0, 0.2);
-    padding: 40px;
-    max-width: 90vw;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    scroll-behavior: smooth;
+  display: flex;
+  gap: 20px;
+  background-color: #e8f1fa;
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.2);
+  padding: 40px;
+  max-width: 90vw;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  scroll-behavior: smooth;
+  border-radius: 8px;
 
-    &::-webkit-scrollbar {
-        height: 8px;
-    }
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
 
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-    &::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.2);
-        transition: background 0.2s ease;
-    }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    transition: background 0.2s ease;
+  }
 
-    &::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.4);
-    }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
 }
 
 .sprint-card {
