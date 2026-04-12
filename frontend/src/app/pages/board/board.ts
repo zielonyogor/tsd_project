@@ -57,4 +57,19 @@ export class Board implements OnInit {
 
     return true;
   }
+
+  public getUserStoriesProgress(): number[] {
+    return this.columns.map(status => this.userStories.filter(story => story.status === status).length);
+  }
+
+  public getProgressPercentage(): number {
+    const counts = this.getUserStoriesProgress();
+    const idx = USER_STORY_STATUSES.indexOf("Done");
+    
+    if (idx === -1) {
+      return 0;
+    }
+
+    return 100 * counts[idx] / this.userStories.length;
+  }
 }

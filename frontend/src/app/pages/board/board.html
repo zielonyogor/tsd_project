@@ -19,3 +19,9 @@
     </div>
   }
 </div>
+
+<div class="progress-background"></div>
+<div class="progress-container">
+    <progress [value]="getProgressPercentage()" [max]="100"></progress>
+    <p>{{ getProgressPercentage().toFixed(0) }}%</p>
+</div>
