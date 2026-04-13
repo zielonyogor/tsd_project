@@ -10,13 +10,13 @@ describe('Home', () => {
   let fixture: ComponentFixture<Home>;
   let baselineBoards: Record<string, SprintBoardData>;
 
-  type HomeTestAccess = {
-    sprints: Array<{
+  interface HomeTestAccess {
+    sprints: {
       id: string;
       goal: string;
       startDate: Date;
       endDate: Date;
-    }>;
+    }[];
     createError: string;
     isCreatingSprint: boolean;
     newSprintForm: {
