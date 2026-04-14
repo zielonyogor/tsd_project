@@ -13,6 +13,7 @@ import { FAKE_SPRINT_BOARDS } from '../../data/fake-sprint-boards';
 })
 export class Home {
   protected readonly sprints: Sprint[] = Object.values(FAKE_SPRINT_BOARDS).map(board => board.sprint);
+  private readonly todayForInput = this.formatDateForInput(new Date());
   protected isCreatingSprint = false;
   protected createError = '';
   protected editSprintError = '';
@@ -23,8 +24,8 @@ export class Home {
 
   protected readonly newSprintForm = {
     title: '',
-    startDate: '',
-    endDate: '',
+    startDate: this.todayForInput,
+    endDate: this.todayForInput,
   };
 
   private readonly router = inject(Router);
@@ -37,8 +38,8 @@ export class Home {
     this.isCreatingSprint = true;
     this.createError = '';
     this.newSprintForm.title = '';
-    this.newSprintForm.startDate = '';
-    this.newSprintForm.endDate = '';
+    this.newSprintForm.startDate = this.todayForInput;
+    this.newSprintForm.endDate = this.todayForInput;
   }
 
   cancelSprintCreation(): void {

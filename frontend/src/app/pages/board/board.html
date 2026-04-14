@@ -26,8 +26,6 @@
         role="button"
         tabindex="0"
         (click)="onBackdropClick($event)"
-        (keydown.enter)="onBackdropClick($event)"
-        (keydown.space)="onBackdropClick($event); $event.preventDefault()"
     >
         <section
             class="create-modal"
@@ -92,8 +90,6 @@
         role="button"
         tabindex="0"
         (click)="onBackdropClick($event)"
-        (keydown.enter)="onBackdropClick($event)"
-        (keydown.space)="onBackdropClick($event); $event.preventDefault()"
     >
         <section
             class="create-modal"
@@ -151,3 +147,8 @@
         </section>
     </div>
 }
+
+<app-progress-bar 
+  [userStories]="userStories" 
+  [columns]="columns">
+</app-progress-bar>
