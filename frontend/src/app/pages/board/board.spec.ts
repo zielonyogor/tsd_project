@@ -4,11 +4,6 @@ import { convertToParamMap } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 
 import { FAKE_SPRINT_BOARDS } from '../../data/fake-sprint-boards';
-import { ActivatedRoute, Router } from '@angular/router';
-import { convertToParamMap } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
-
-import { FAKE_SPRINT_BOARDS } from '../../data/fake-sprint-boards';
 
 import { Board } from './board';
 
@@ -17,13 +12,8 @@ describe('Board', () => {
   let fixture: ComponentFixture<Board>;
   let navigateCalls: unknown[][];
   let paramMapSubject: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
-  let navigateCalls: unknown[][];
-  let paramMapSubject: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
 
   beforeEach(async () => {
-    navigateCalls = [];
-    paramMapSubject = new BehaviorSubject(convertToParamMap({ id: '1' }));
-
     navigateCalls = [];
     paramMapSubject = new BehaviorSubject(convertToParamMap({ id: '1' }));
 
@@ -46,28 +36,10 @@ describe('Board', () => {
           },
         },
       ],
-      providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            paramMap: paramMapSubject.asObservable(),
-          },
-        },
-        {
-          provide: Router,
-          useValue: {
-            navigate: (...commands: unknown[]) => {
-              navigateCalls.push(commands);
-              return Promise.resolve(true);
-            },
-          },
-        },
-      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Board);
     component = fixture.componentInstance;
-    fixture.detectChanges();
     fixture.detectChanges();
     await fixture.whenStable();
   });
