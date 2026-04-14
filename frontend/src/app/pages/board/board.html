@@ -20,37 +20,7 @@
   }
 </div>
 
-@if (isProgressOpen) {
-    <div class="modal-overlay" (click)="toggleProgressDisplay()" role="button" tabindex="0"
-        (keydown.enter)="toggleProgressDisplay()" (keydown.space)="toggleProgressDisplay()">
-        <div class="modal-content" (click)="$event.stopPropagation()" role="button" tabindex="0"
-            (keydown.enter)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
-            <h3>Sprint Progress by Status</h3>
-            <div class="progress-bar">
-                @for (item of getStatusProgress(); track item.status) {
-                    <div class="progress-segment"
-                        [style.width.%]="item.width"
-                        [style.background]="item.color">
-                    </div>
-                }
-            </div>
-            @for (item of getStatusProgress(); track item.status) {
-                <div class="status-row">
-                <span class="color-dot" [style.background-color]="item.color"></span>
-                <span>{{ item.status }}</span>
-                <span class="count">{{ item.count }}</span>
-                </div>
-            }
-            <button (click)="toggleProgressDisplay()">Close</button>
-        </div>
-    </div>
-}
-
-<div class="progress-background"></div>
-<div class="progress-container">
-    <progress [value]="getProgressPercentage()" [max]="100"
-        (click)="toggleProgressDisplay()" role="button" tabindex="0"
-        (keydown.enter)="toggleProgressDisplay()" (keydown.space)="toggleProgressDisplay()">
-    </progress>
-    <p>{{ getProgressPercentage().toFixed(0) }}%</p>
-</div>
+<app-progress-bar 
+  [userStories]="userStories" 
+  [columns]="columns">
+</app-progress-bar>

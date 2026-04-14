@@ -5,23 +5,22 @@ import type { Sprint } from '../../../types/sprint';
 import { USER_STORY_STATUSES, UserStoryStatus, type UserStory } from '../../../types/userStory';
 import { UserStoryCard } from './components/user-story-card/user-story-card';
 import { FAKE_SPRINT_BOARDS } from '../../data/fake-sprint-boards';
+import { ProgressBar } from './components/progress-bar/progress-bar';
 
 @Component({
   selector: 'app-board',
   templateUrl: './board.html',
   styleUrl: './board.scss',
-  imports: [DatePipe, UserStoryCard],
+  imports: [DatePipe, UserStoryCard, ProgressBar],
 })
 export class Board implements OnInit {
   protected readonly columns = USER_STORY_STATUSES;
 
   public sprint!: Sprint;
-  private userStories: UserStory[] = [];
+  protected userStories: UserStory[] = [];
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-
-  public isProgressOpen = false;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(paramMap => {
@@ -58,54 +57,5 @@ export class Board implements OnInit {
     this.userStories = boardData.userStories;
 
     return true;
-  }
-
-  public toggleProgressDisplay(): void {
-    this.isProgressOpen = (!this.isProgressOpen) && (this.userStories.length > 0);
-  }
-
-  public getStatusProgress() {
-    const total = this.userStories.length || 1;
-    return this.columns.map(status => {
-      const count = this.userStories.filter(story => story.status === status).length;
-      return {
-        status,
-        count,
-        color: this.getColorForStatus(status),
-        width: (count / total) * 100
-      };
-    }).filter(itm => itm.count > 0);
-  }
-
-  private getColorForStatus(status: string) {
-    switch(status) {
-      case "To Do":
-        return "#757575";
-      case "Blocked":
-        return "#f44336";
-      case "In Progress":
-        return "#2196f3";
-      case "Code Review":
-        return "#ff9800";
-      case "Done":
-        return "#4caf50";
-      default:
-        return "#202020";
-    }
-  }
-
-  public getUserStoriesProgress(): number[] {
-    return this.columns.map(status => this.userStories.filter(story => story.status === status).length);
-  }
-
-  public getProgressPercentage(): number {
-    const counts = this.getUserStoriesProgress();
-    const idx = USER_STORY_STATUSES.indexOf("Done");
-    
-    if (idx === -1 || this.userStories.length === 0) {
-      return 0;
-    }
-
-    return 100 * counts[idx] / this.userStories.length;
   }
 }
