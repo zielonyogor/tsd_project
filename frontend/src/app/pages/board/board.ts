@@ -6,12 +6,13 @@ import type { Sprint } from '../../../types/sprint';
 import { USER_STORY_STATUSES, UserStoryStatus, type UserStory } from '../../../types/userStory';
 import { UserStoryCard } from './components/user-story-card/user-story-card';
 import { FAKE_SPRINT_BOARDS } from '../../data/fake-sprint-boards';
+import { ProgressBar } from './components/progress-bar/progress-bar';
 
 @Component({
   selector: 'app-board',
   templateUrl: './board.html',
   styleUrl: './board.scss',
-  imports: [DatePipe, FormsModule, UserStoryCard],
+  imports: [DatePipe, FormsModule, UserStoryCard, ProgressBar],
 })
 export class Board implements OnInit {
   protected readonly columns = USER_STORY_STATUSES;
@@ -31,7 +32,7 @@ export class Board implements OnInit {
   protected editStoryError = '';
 
   public sprint!: Sprint;
-  private userStories: UserStory[] = [];
+  protected userStories: UserStory[] = [];
   private editingStoryId: string | null = null;
 
   private readonly route = inject(ActivatedRoute);
