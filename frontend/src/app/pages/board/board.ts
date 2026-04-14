@@ -77,6 +77,7 @@ export class Board implements OnInit {
   protected onBackdropClick(event: Event): void {
     if (event.target === event.currentTarget) {
       this.cancelStoryCreation();
+      this.cancelStoryEditing();
     }
   }
 
