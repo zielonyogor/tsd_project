@@ -8,6 +8,7 @@
       - "8080:8080"
     environment:
       - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=mydb;Username=postgres;Password=password
     volumes:
       - ./backend:/src/backend
       - /src/backend/bin
