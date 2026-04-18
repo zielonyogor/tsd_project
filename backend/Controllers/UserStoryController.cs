@@ -43,5 +43,19 @@ namespace SprintTracker.Controllers
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetUserStories), null, newUserStory);
         }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateUserStory(int id, UpdateUserStoryRequest userStory)
+        {
+            var existingUserStory = _context.UserStories.Find(id);
+            if (existingUserStory == null)
+            {
+                return NotFound();
+            }
+
+            _mapper.MapToUserStory(userStory, existingUserStory);
+            _context.SaveChanges();
+            return NoContent();
+        }
     }
 }

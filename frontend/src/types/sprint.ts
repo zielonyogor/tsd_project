@@ -4,3 +4,10 @@ export interface Sprint {
   startDate: Date;
   endDate: Date;
 }
+
+export interface SprintApiResponse {
+  id: number | string;
+  name?: string;
+  startDate: string;
+  endDate: string;
+}
