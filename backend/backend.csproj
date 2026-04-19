@@ -6,8 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dd125b8e-d7ab-41a2-bc8d-49ba4ba228b4</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	<RootNamespace>SprintTracker.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-	<AssemblyName>SprintTracker.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>SprintTracker.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <AssemblyName>SprintTracker.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

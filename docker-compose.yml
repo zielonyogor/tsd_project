@@ -17,6 +17,22 @@
       db:
         condition: service_healthy
 
+  backend-tests:
+    build:
+      context: .
+      dockerfile: backend.tests/Dockerfile
+    profiles:
+      - test
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./backend:/app/backend
+      - ./backend.tests:/app/backend.tests
+      - /app/backend/bin
+      - /app/backend/obj
+      - /app/backend.tests/bin
+      - /app/backend.tests/obj
+
   frontend:
     build: ./frontend
     ports:

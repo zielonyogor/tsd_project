@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+
+using Microsoft.AspNetCore.Mvc;
 
 using SprintTracker.Database.Data;
 using SprintTracker.DTO.Requests;

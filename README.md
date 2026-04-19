@@ -8,6 +8,23 @@ To run the application, run docker compose in root directory:
 docker-compose up
 ```
 
+### Linting
+
+To apply code style run:
+
+#### For backend
+
+```bash
+dotnet format
+```
+
+#### For frontend
+
+```bash
+npx ng lint
+```
+
+
 ## Database models
 
 The backend uses PostgreSQL with two main tables:
@@ -58,3 +75,20 @@ docker-compose exec -T db psql -U postgres -d mydb < db/seed.sql
 ```
 
 The script is repeatable and first clears `UserStories` and `Sprints` before inserting fresh sample data.
+
+## Backend testing
+
+Run backend tests in Docker with:
+
+```bash
+./scripts/run-backend-tests.sh
+```
+
+That wrapper runs the dedicated `backend-tests` service from `docker-compose.yml` and executes:
+
+```bash
+docker compose --profile test run --rm --build backend-tests
+```
+
+If you want to pass extra `dotnet test` arguments, append them to the script command.
+
