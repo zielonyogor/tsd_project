@@ -1,12 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, type ParamMap } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import type { Sprint } from '../../../types/sprint';
 import { USER_STORY_STATUSES, UserStoryStatus, type UserStory } from '../../../types/userStory';
 import { UserStoryCard } from './components/user-story-card/user-story-card';
-import { FAKE_SPRINT_BOARDS } from '../../data/fake-sprint-boards';
 import { ProgressBar } from './components/progress-bar/progress-bar';
+import { SprintService } from './../../services/sprint.service';
 
 @Component({
   selector: 'app-board',
@@ -30,21 +30,28 @@ export class Board implements OnInit {
   protected isEditingStory = false;
   protected createStoryError = '';
   protected editStoryError = '';
+  protected isLoading = false;
+  protected loadError = '';
 
-  public sprint!: Sprint;
+  public sprint: Sprint | null = null;
   protected userStories: UserStory[] = [];
   private editingStoryId: string | null = null;
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly service = inject(SprintService);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       const boardId = paramMap.get('id');
 
-      if (!boardId || !this.loadBoard(boardId)) {
+      if (!boardId) {
         void this.router.navigate(['/']);
+        return;
       }
+
+      void this.loadBoard(boardId);
     });
   }
 
@@ -92,16 +99,25 @@ export class Board implements OnInit {
     }
 
     const story: UserStory = {
-      id: this.getNextStoryId(),
+      id: '',
       title,
       description,
       status: this.newStoryForm.status,
-      sprintId: this.sprint.id,
+      sprintId: this.sprint?.id ?? '',
     };
 
-    this.userStories.push(story);
-    this.createStoryError = '';
-    this.isCreatingStory = false;
+    void (async () => {
+      try {
+        const createdStory = await this.service.createUserStory(story);
+        this.userStories.push(createdStory);
+        this.createStoryError = '';
+        this.isCreatingStory = false;
+        this.cdr.markForCheck();
+      } catch {
+        this.createStoryError = 'Failed to create user story. Please try again.';
+        this.cdr.markForCheck();
+      }
+    })();
   }
 
   protected saveStory(): void {
@@ -124,41 +140,27 @@ export class Board implements OnInit {
       return;
     }
 
-    story.title = title;
-    story.description = description;
-    story.status = this.editStoryForm.status;
+    const updated: UserStory = {
+      ...story,
+      title,
+      description,
+      status: this.editStoryForm.status,
+    };
 
-    this.editStoryError = '';
-    this.cancelStoryEditing();
-  }
-
-  private loadBoard(boardId: string): boolean {
-    const boardData = FAKE_SPRINT_BOARDS[boardId];
-
-    if (!boardData) {
-      return false;
-    }
-
-    this.sprint = boardData.sprint;
-    this.userStories = boardData.userStories;
-
-    return true;
-  }
-
-  private getNextStoryId(): string {
-    let maxId = 0;
-
-    for (const board of Object.values(FAKE_SPRINT_BOARDS)) {
-      for (const story of board.userStories) {
-        const numericId = Number.parseInt(story.id, 10);
-
-        if (!Number.isNaN(numericId) && numericId > maxId) {
-          maxId = numericId;
-        }
+    void (async () => {
+      try {
+        await this.service.updateUserStory(updated);
+        story.title = updated.title;
+        story.description = updated.description;
+        story.status = updated.status;
+        this.editStoryError = '';
+        this.cancelStoryEditing();
+        this.cdr.markForCheck();
+      } catch {
+        this.editStoryError = 'Failed to save user story. Please try again.';
+        this.cdr.markForCheck();
       }
-    }
-
-    return String(maxId + 1);
+    })();
   }
 
   private startEditingStory(story: UserStory): void {
@@ -168,5 +170,34 @@ export class Board implements OnInit {
     this.editStoryForm.status = story.status;
     this.editStoryError = '';
     this.isEditingStory = true;
+  }
+
+  private async loadBoard(boardId: string): Promise<void> {
+    this.isLoading = true;
+    this.loadError = '';
+
+    try {
+      const [sprints, userStories] = await Promise.all([
+        this.service.getSprints(),
+        this.service.getStories(boardId),
+      ]);
+      const sprint = sprints.find(item => item.id === boardId);
+
+      if (!sprint) {
+        void this.router.navigate(['/']);
+        return;
+      }
+
+      this.sprint = sprint;
+      this.userStories = userStories;
+      this.cdr.markForCheck();
+    } catch {
+      this.loadError = 'Could not load sprint board from backend.';
+      this.sprint = null;
+      this.userStories = [];
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    }
   }
 }

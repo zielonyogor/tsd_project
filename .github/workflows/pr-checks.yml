@@ -10,10 +10,6 @@ jobs:
   backend-checks:
     name: Backend Lint & Test
     runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: ./backend
 
     steps:
       - name: Checkout Code

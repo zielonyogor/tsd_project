@@ -6,12 +6,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dd125b8e-d7ab-41a2-bc8d-49ba4ba228b4</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	<RootNamespace>SprintTracker.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-	<AssemblyName>SprintTracker.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>SprintTracker.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <AssemblyName>SprintTracker.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9" />
   </ItemGroup>
