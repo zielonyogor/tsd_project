@@ -7,7 +7,8 @@
     "types": [
       "vitest/globals",
       "node"
-    ]
+    ],
+    "rootDir": "src"
   },
   "include": [
     "src/**/*.d.ts",

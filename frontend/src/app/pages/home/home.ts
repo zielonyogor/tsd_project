@@ -3,7 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import type { Sprint } from '../../../types/sprint';
-import { createSprintFromBackend, getSprintsFromBackend, updateSprintFromBackend } from '../../data/backend-api';
+import { SprintService } from '../../services/sprint.service';
 
 @Component({
   selector: 'app-home',
@@ -32,6 +32,7 @@ export class Home implements OnInit {
 
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly service = inject(SprintService);
 
   ngOnInit(): void {
     void this.loadSprints();
@@ -85,7 +86,7 @@ export class Home implements OnInit {
 
     void (async () => {
       try {
-        const createdSprint = await createSprintFromBackend(sprint);
+        const createdSprint = await this.service.createSprint(sprint);
         this.sprints.push(createdSprint);
         this.isCreatingSprint = false;
         this.createError = '';
@@ -130,7 +131,7 @@ export class Home implements OnInit {
 
     void (async () => {
       try {
-        const updatedSprint = await updateSprintFromBackend({
+        const updatedSprint = await this.service.updateSprint({
           ...sprint,
           goal: updatedGoal,
           startDate: updatedStartDate,
@@ -192,9 +193,7 @@ export class Home implements OnInit {
     this.loadError = '';
 
     try {
-      this.sprints = await getSprintsFromBackend();
-      console.log('Loaded sprints from home.html :', this.sprints);
-      this.cdr.markForCheck();
+      this.sprints = await this.service.getSprints();
     } catch {
       this.loadError = 'Could not load sprints from backend.';
       this.sprints = [];

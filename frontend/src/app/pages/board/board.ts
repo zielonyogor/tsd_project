@@ -5,8 +5,8 @@ import { FormsModule } from '@angular/forms';
 import type { Sprint } from '../../../types/sprint';
 import { USER_STORY_STATUSES, UserStoryStatus, type UserStory } from '../../../types/userStory';
 import { UserStoryCard } from './components/user-story-card/user-story-card';
-import { createUserStoryFromBackend, getSprintsFromBackend, getUserStoriesBySprintFromBackend, updateUserStoryFromBackend } from '../../data/backend-api';
 import { ProgressBar } from './components/progress-bar/progress-bar';
+import { SprintService } from './../../services/sprint.service';
 
 @Component({
   selector: 'app-board',
@@ -40,6 +40,7 @@ export class Board implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly service = inject(SprintService);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
@@ -107,7 +108,7 @@ export class Board implements OnInit {
 
     void (async () => {
       try {
-        const createdStory = await createUserStoryFromBackend(story);
+        const createdStory = await this.service.createUserStory(story);
         this.userStories.push(createdStory);
         this.createStoryError = '';
         this.isCreatingStory = false;
@@ -148,7 +149,7 @@ export class Board implements OnInit {
 
     void (async () => {
       try {
-        await updateUserStoryFromBackend(updated);
+        await this.service.updateUserStory(updated);
         story.title = updated.title;
         story.description = updated.description;
         story.status = updated.status;
@@ -162,14 +163,23 @@ export class Board implements OnInit {
     })();
   }
 
+  private startEditingStory(story: UserStory): void {
+    this.editingStoryId = story.id;
+    this.editStoryForm.title = story.title;
+    this.editStoryForm.description = story.description;
+    this.editStoryForm.status = story.status;
+    this.editStoryError = '';
+    this.isEditingStory = true;
+  }
+
   private async loadBoard(boardId: string): Promise<void> {
     this.isLoading = true;
     this.loadError = '';
 
     try {
       const [sprints, userStories] = await Promise.all([
-        getSprintsFromBackend(),
-        getUserStoriesBySprintFromBackend(boardId),
+        this.service.getSprints(),
+        this.service.getStories(boardId),
       ]);
       const sprint = sprints.find(item => item.id === boardId);
 
@@ -189,14 +199,5 @@ export class Board implements OnInit {
       this.isLoading = false;
       this.cdr.markForCheck();
     }
-  }
-
-  private startEditingStory(story: UserStory): void {
-    this.editingStoryId = story.id;
-    this.editStoryForm.title = story.title;
-    this.editStoryForm.description = story.description;
-    this.editStoryForm.status = story.status;
-    this.editStoryError = '';
-    this.isEditingStory = true;
   }
 }

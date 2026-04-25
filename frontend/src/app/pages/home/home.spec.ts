@@ -1,14 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 
-import { FAKE_SPRINT_BOARDS, type SprintBoardData } from '../../data/fake-sprint-boards';
+import { FAKE_SPRINT_BOARDS, FAKE_SPRINTS, type SprintBoardData } from '../../data/fake-sprint-boards';
 
 import { Home } from './home';
+import { SprintService } from '../../services/sprint.service';
 
 describe('Home', () => {
   let component: Home;
   let fixture: ComponentFixture<Home>;
   let baselineBoards: Record<string, SprintBoardData>;
+
+  const mockSprintService = {
+    getSprints: vi.fn(),
+    createSprint: vi.fn(),
+  };
 
   interface HomeTestAccess {
     sprints: {
@@ -56,6 +62,10 @@ describe('Home', () => {
 
   beforeEach(async () => {
     restoreBoards(baselineBoards);
+    
+    vi.clearAllMocks();
+    mockSprintService.getSprints.mockResolvedValue(FAKE_SPRINTS);
+    mockSprintService.createSprint.mockImplementation((sprint) => Promise.resolve(sprint));
 
     await TestBed.configureTestingModule({
       imports: [Home],
@@ -65,6 +75,10 @@ describe('Home', () => {
           useValue: {
             navigate: () => Promise.resolve(true),
           },
+        },
+        {
+          provide: SprintService,
+          useValue: mockSprintService
         },
       ],
     }).compileComponents();
@@ -118,7 +132,7 @@ describe('Home', () => {
     expect(home.sprints.length).toBe(initialCount);
   });
 
-  it('creates sprint when title and dates are valid', () => {
+  it('creates sprint when title and dates are valid', async () => {
     const home = component as unknown as HomeTestAccess;
     const initialCount = home.sprints.length;
 
@@ -128,6 +142,8 @@ describe('Home', () => {
     home.newSprintForm.endDate = '2026-04-14';
 
     component.createSprint();
+    await fixture.whenStable();
+    fixture.detectChanges();
 
     const createdSprint = home.sprints[home.sprints.length - 1];
 
@@ -137,6 +153,6 @@ describe('Home', () => {
     expect(createdSprint.goal).toBe('Ship release dashboard');
     expect(createdSprint.startDate).toEqual(new Date(2026, 3, 1));
     expect(createdSprint.endDate).toEqual(new Date(2026, 3, 14));
-    expect(FAKE_SPRINT_BOARDS[createdSprint.id]).toBeDefined();
+    expect(home.sprints[initialCount]).toBeDefined();
   });
 });

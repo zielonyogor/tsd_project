@@ -25,7 +25,9 @@ jobs:
           dotnet-version: '9.0'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: |
+          dotnet restore backend/
+          dotnet restore backend.tests/
 
       - name: Lint Code
         run: dotnet format --verify-no-changes
@@ -34,7 +36,7 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Run Tests
-        run: dotnet test --no-build --configuration Release --verbosity normal
+        run: dotnet test backend.tests/ --no-build --configuration Release
 
   frontend-checks:
     name: Frontend Lint & Test
