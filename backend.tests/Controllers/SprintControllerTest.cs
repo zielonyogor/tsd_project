@@ -33,10 +33,11 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             var mapper = new SprintMapper();
             var controller = new SprintController(context, mapper);
-            var request = new CreateSprintRequest { 
-                Name = "New Sprint", 
-                StartDate = DateTime.UtcNow, 
-                EndDate = DateTime.UtcNow.AddDays(14) 
+            var request = new CreateSprintRequest
+            {
+                Name = "New Sprint",
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(14)
             };
 
             var result = controller.CreateSprint(request);
@@ -51,10 +52,11 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             var mapper = new SprintMapper();
             var controller = new SprintController(context, mapper);
-            var request = new CreateSprintRequest { 
-                Name = "Updated Sprint", 
-                StartDate = DateTime.UtcNow, 
-                EndDate = DateTime.UtcNow.AddDays(14) 
+            var request = new CreateSprintRequest
+            {
+                Name = "Updated Sprint",
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(14)
             };
 
             var result = controller.UpdateSprint(1, request);
@@ -76,7 +78,7 @@ namespace SprintTracker.Tests.Controllers
 
         private void SeedSprints(AppDbContext context)
         {
-            context.Sprints.Add( new Sprint { Id = 1, Name = "Sprint 1" });
+            context.Sprints.Add(new Sprint { Id = 1, Name = "Sprint 1" });
             context.SaveChanges();
         }
     }

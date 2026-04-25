@@ -12,9 +12,9 @@ namespace SprintTracker.Tests.Mapper
         public void MapToUserStory_ShouldHandleSpacesInStatus()
         {
             var mapper = new UserStoryMapper();
-            var request = new CreateUserStoryRequest 
-            { 
-                Title = "Test Story", 
+            var request = new CreateUserStoryRequest
+            {
+                Title = "Test Story",
                 Status = "In Progress",
                 Description = "Test Description"
             };

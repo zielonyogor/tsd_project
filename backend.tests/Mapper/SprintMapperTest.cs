@@ -10,11 +10,11 @@ namespace SprintTracker.Tests.Mapper
         public void MapToSprint_ShouldHandleSpacesInName()
         {
             var mapper = new SprintMapper();
-            var request = new CreateSprintRequest 
-            { 
-                Name = "Sprint 1", 
-                StartDate = DateTime.UtcNow, 
-                EndDate = DateTime.UtcNow.AddDays(14) 
+            var request = new CreateSprintRequest
+            {
+                Name = "Sprint 1",
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(14)
             };
             var result = mapper.MapToSprint(request);
 

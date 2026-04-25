@@ -48,10 +48,11 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             var mapper = new UserStoryMapper();
             var controller = new UserStoryController(context, mapper);
-            var request = new DTO.Requests.CreateUserStoryRequest { 
-                Title = "New User Story", 
-                Description = "Description of the user story", 
-                SprintId = 1 
+            var request = new DTO.Requests.CreateUserStoryRequest
+            {
+                Title = "New User Story",
+                Description = "Description of the user story",
+                SprintId = 1
             };
 
             var result = controller.CreateUserStory(request);
@@ -66,10 +67,11 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             var mapper = new UserStoryMapper();
             var controller = new UserStoryController(context, mapper);
-            var request = new DTO.Requests.UpdateUserStoryRequest { 
-                Title = "Updated User Story", 
-                Description = "Updated description", 
-                SprintId = 1 
+            var request = new DTO.Requests.UpdateUserStoryRequest
+            {
+                Title = "Updated User Story",
+                Description = "Updated description",
+                SprintId = 1
             };
 
             var result = controller.UpdateUserStory(2, request);
@@ -94,7 +96,7 @@ namespace SprintTracker.Tests.Controllers
 
         private void SeedUserStories(AppDbContext context)
         {
-            context.UserStories.AddRange( 
+            context.UserStories.AddRange(
                 new UserStory { Id = 1, Title = "User Story 1" },
                 new UserStory { Id = 2, Title = "User Story 2", SprintId = 1 }
             );
