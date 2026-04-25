@@ -10,10 +10,6 @@ jobs:
   backend-checks:
     name: Backend Lint & Test
     runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: ./backend
 
     steps:
       - name: Checkout Code
@@ -25,9 +21,7 @@ jobs:
           dotnet-version: '9.0'
 
       - name: Restore dependencies
-        run: |
-          dotnet restore backend/
-          dotnet restore backend.tests/
+        run: dotnet restore
 
       - name: Lint Code
         run: dotnet format --verify-no-changes
@@ -36,7 +30,7 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Run Tests
-        run: dotnet test backend.tests/ --no-build --configuration Release
+        run: dotnet test --no-build --configuration Release --verbosity normal
 
   frontend-checks:
     name: Frontend Lint & Test
