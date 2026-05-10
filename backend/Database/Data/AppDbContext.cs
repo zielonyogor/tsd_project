@@ -8,6 +8,8 @@ namespace SprintTracker.Database.Data
     {
         public DbSet<Sprint> Sprints { get; set; }
         public DbSet<UserStory> UserStories { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<SprintMember> SprintMembers { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
