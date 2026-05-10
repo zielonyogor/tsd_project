@@ -1,8 +1,6 @@
 services:
   backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile.prod
+    image: tsd-backend:latest 
     ports:
       - "8080:8080"
     environment:
@@ -16,9 +14,7 @@ services:
       - app-network
 
   frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile.prod
+    image: tsd-frontend:latest
     ports:
       - "80:80"
     depends_on:
