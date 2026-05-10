@@ -1,18 +1,20 @@
-import { Component, inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import type { Sprint } from '../../../types/sprint';
-import { FAKE_SPRINT_BOARDS } from '../../data/fake-sprint-boards';
+import { SprintService } from '../../services/sprint.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.html',
   styleUrl: './home.scss',
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, FormsModule, CommonModule],
 })
-export class Home {
-  protected readonly sprints: Sprint[] = Object.values(FAKE_SPRINT_BOARDS).map(board => board.sprint);
+export class Home implements OnInit {
+  protected sprints: Sprint[] = [];
+  protected isLoading = false;
+  protected loadError = '';
   private readonly todayForInput = this.formatDateForInput(new Date());
   protected isCreatingSprint = false;
   protected createError = '';
@@ -29,6 +31,12 @@ export class Home {
   };
 
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly service = inject(SprintService);
+
+  ngOnInit(): void {
+    void this.loadSprints();
+  }
 
   goToSprint(sprintId: string): void {
     void this.router.navigate(['/board', sprintId]);
@@ -76,14 +84,18 @@ export class Home {
       endDate,
     };
 
-    this.sprints.push(sprint);
-    FAKE_SPRINT_BOARDS[newId] = {
-      sprint,
-      userStories: [],
-    };
-
-    this.isCreatingSprint = false;
-    this.createError = '';
+    void (async () => {
+      try {
+        const createdSprint = await this.service.createSprint(sprint);
+        this.sprints.push(createdSprint);
+        this.isCreatingSprint = false;
+        this.createError = '';
+        this.cdr.markForCheck();
+      } catch {
+        this.createError = 'Failed to create sprint. Please try again.';
+        this.cdr.markForCheck();
+      }
+    })();
   }
 
   startEditingGoal(sprint: Sprint): void {
@@ -117,10 +129,27 @@ export class Home {
       return;
     }
 
-    sprint.goal = updatedGoal;
-    sprint.startDate = updatedStartDate;
-    sprint.endDate = updatedEndDate;
-    this.cancelEditingGoal();
+    void (async () => {
+      try {
+        const updatedSprint = await this.service.updateSprint({
+          ...sprint,
+          goal: updatedGoal,
+          startDate: updatedStartDate,
+          endDate: updatedEndDate,
+        });
+        
+        const index = this.sprints.findIndex(s => s.id === sprint.id);
+        if (index !== -1) {
+          this.sprints[index] = updatedSprint;
+        }
+        
+        this.cancelEditingGoal();
+        this.cdr.markForCheck();
+      } catch {
+        this.editSprintError = 'Failed to save sprint. Please try again.';
+        this.cdr.markForCheck();
+      }
+    })();
   }
 
   private parseDate(value: string): Date | null {
@@ -157,5 +186,20 @@ export class Home {
     }
 
     return String(maxId + 1);
+  }
+
+  private async loadSprints(): Promise<void> {
+    this.isLoading = true;
+    this.loadError = '';
+
+    try {
+      this.sprints = await this.service.getSprints();
+    } catch {
+      this.loadError = 'Could not load sprints from backend.';
+      this.sprints = [];
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    }
   }
 }

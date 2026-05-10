@@ -5,8 +5,10 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "types": [
-      "vitest/globals"
-    ]
+      "vitest/globals",
+      "node"
+    ],
+    "rootDir": "src"
   },
   "include": [
     "src/**/*.d.ts",

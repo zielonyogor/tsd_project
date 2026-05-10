@@ -1,6 +1,36 @@
-@backend_HostAddress = http://localhost:5036
+@backend_HostAddress = http://localhost:8080
 
 GET {{backend_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{backend_HostAddress}}/sprint/
+Accept: application/json
+
+###
+
+POST {{backend_HostAddress}}/sprint/
+Content-Type: application/json
+
+{
+    "name": "Sprint 1",
+    "startDate": "2026-04-17",
+    "endDate": "2026-05-01"
+}
+
+###
+
+GET {{backend_HostAddress}}/userstory/
+Accept: application/json
+
+###
+
+POST {{backend_HostAddress}}/userstory/
+Content-Type: application/json
+
+{
+    "title": "Implement login functionality",
+    "description": "As a user, I want to be able to log in to the application so that I can access my personalized dashboard.",
+    "status": "To Do"
+}

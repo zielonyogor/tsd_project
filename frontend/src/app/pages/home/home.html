@@ -1,5 +1,13 @@
 <h1 class="title">Your sprints</h1>
 
+@if (isLoading) {
+  <p>Loading sprints...</p>
+}
+
+@if (loadError) {
+  <p class="error-msg">{{ loadError }}</p>
+}
+
 <div class="sprint-container">
   <div class="sprint-list">
     @for (s of sprints; track s.id) {

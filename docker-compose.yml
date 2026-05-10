@@ -8,6 +8,7 @@
       - "8080:8080"
     environment:
       - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=mydb;Username=postgres;Password=password
     volumes:
       - ./backend:/src/backend
       - /src/backend/bin
@@ -15,6 +16,22 @@
     depends_on:
       db:
         condition: service_healthy
+
+  backend-tests:
+    build:
+      context: .
+      dockerfile: backend.tests/Dockerfile
+    profiles:
+      - test
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./backend:/app/backend
+      - ./backend.tests:/app/backend.tests
+      - /app/backend/bin
+      - /app/backend/obj
+      - /app/backend.tests/bin
+      - /app/backend.tests/obj
 
   frontend:
     build: ./frontend

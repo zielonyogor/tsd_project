@@ -1,7 +1,8 @@
 
 using Microsoft.EntityFrameworkCore;
 
-using SprintTracker.Data;
+using SprintTracker.Database.Data;
+using SprintTracker.Mapper;
 
 namespace SprintTracker
 {
@@ -12,10 +13,25 @@ namespace SprintTracker
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
-            builder.Services.AddControllers();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Frontend", policy =>
+                {
+                    policy
+                        .WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+                });
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddSingleton<UserStoryMapper>();
+            builder.Services.AddSingleton<SprintMapper>();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
@@ -28,6 +44,8 @@ namespace SprintTracker
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("Frontend");
 
             app.UseAuthorization();
 
