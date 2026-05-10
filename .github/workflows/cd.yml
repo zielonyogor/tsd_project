@@ -1,0 +1,71 @@
+name: CD - Release
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Release Version
+        id: version
+        run: echo "tag=release-$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Backend Docker Image
+        run: |
+          docker build \
+            -f backend/Dockerfile.prod \
+            -t tsd-backend:${{ steps.version.outputs.tag }} \
+            -t tsd-backend:latest \
+            . # <--- IMPORTANT: Use root context
+
+      - name: Build Frontend Docker Image
+        run: |
+          docker build \
+            -f frontend/Dockerfile.prod \
+            -t tsd-frontend:${{ steps.version.outputs.tag }} \
+            -t tsd-frontend:latest \
+            . # <--- IMPORTANT: Use root context
+
+      - name: Save Docker Images to tar
+        run: |
+          docker save tsd-backend:${{ steps.version.outputs.tag }} | gzip > tsd-backend.tar.gz
+          docker save tsd-frontend:${{ steps.version.outputs.tag }} | gzip > tsd-frontend.tar.gz
+
+      - name: Package Release Zip
+        run: |
+          mkdir release
+          cp tsd-backend.tar.gz release/
+          cp tsd-frontend.tar.gz release/
+          # Ensure you use the versioned images in the compose file or 
+          # keep them as 'latest' if the user loads them manually
+          cp docker-compose.prod.yml release/
+          zip -j release-${{ steps.version.outputs.tag }}.zip release/*
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Release ${{ steps.version.outputs.tag }}
+          body: |
+            ## Automated Release
+            **Commit:** ${{ github.sha }}
+            
+            ### Deployment Instructions
+            1. Download the `.zip` below.
+            2. `unzip` the file on your server.
+            3. Run `docker load < tsd-backend.tar.gz`
+            4. Run `docker load < tsd-frontend.tar.gz`
+            5. Run `docker compose -f docker-compose.prod.yml up -d`
+          files: release-${{ steps.version.outputs.tag }}.zip
