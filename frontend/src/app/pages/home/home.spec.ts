@@ -22,6 +22,7 @@ describe('Home', () => {
       goal: string;
       startDate: Date;
       endDate: Date;
+      sessionCode: string;
     }[];
     createError: string;
     isCreatingSprint: boolean;
@@ -65,7 +66,11 @@ describe('Home', () => {
     
     vi.clearAllMocks();
     mockSprintService.getSprints.mockResolvedValue(FAKE_SPRINTS);
-    mockSprintService.createSprint.mockImplementation((sprint) => Promise.resolve(sprint));
+    mockSprintService.createSprint.mockImplementation((sprint) => Promise.resolve({
+      sprint: { ...sprint, sessionCode: 'ZZZZ9999' },
+      accessToken: 'token',
+      joinUrl: '/board/ZZZZ9999',
+    }));
 
     await TestBed.configureTestingModule({
       imports: [Home],
@@ -128,7 +133,7 @@ describe('Home', () => {
 
     component.createSprint();
 
-    expect(home.createError).toBe('Please provide sprint title, start date and end date.');
+    expect(home.createError).toBe('Please provide sprint session title, start date and end date.');
     expect(home.sprints.length).toBe(initialCount);
   });
 
@@ -153,6 +158,7 @@ describe('Home', () => {
     expect(createdSprint.goal).toBe('Ship release dashboard');
     expect(createdSprint.startDate).toEqual(new Date(2026, 3, 1));
     expect(createdSprint.endDate).toEqual(new Date(2026, 3, 14));
+    expect(createdSprint.sessionCode).toBe('ZZZZ9999');
     expect(home.sprints[initialCount]).toBeDefined();
   });
 });

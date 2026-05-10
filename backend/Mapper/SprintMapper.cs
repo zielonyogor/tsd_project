@@ -9,6 +9,7 @@ namespace SprintTracker.Mapper
         {
             return new Sprint
             {
+                SessionCode = string.Empty,
                 Name = request.Name,
                 StartDate = request.StartDate,
                 EndDate = request.EndDate

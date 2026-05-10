@@ -1,5 +1,63 @@
 <h1 class="title">Your sprints</h1>
 
+<section class="sprint-container">
+  <div class="sprint-list">
+    <button class="sprint-card sprint-add-btn" type="button" (click)="addSprint()">
+      <h2>+ Create Sprint Session</h2>
+    </button>
+
+    <article class="sprint-card">
+      <h2>Join existing session</h2>
+      <label class="field-label" for="join-session-code">Session code</label>
+      <input
+        id="join-session-code"
+        type="text"
+        class="field-input"
+        [(ngModel)]="joinSessionCode"
+        placeholder="ABCD1234"
+      />
+      @if (joinSessionError) {
+        <p class="error-msg">{{ joinSessionError }}</p>
+      }
+      <div class="actions-row">
+        <button class="card-action-btn" type="button" (click)="joinSprintSession()">Join session</button>
+      </div>
+    </article>
+  </div>
+</section>
+
+@if (showSessionReadyPopup && latestSessionCode) {
+  <div
+    class="create-modal-backdrop"
+    tabindex="0"
+    (click)="closeSessionReadyPopup()"
+    (keyup.enter)="closeSessionReadyPopup()"
+  >
+    <section
+      class="create-modal session-ready-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="session-ready-title"
+    >
+      <div class="create-modal-header">
+        <h2 id="session-ready-title">Session ready</h2>
+        <button class="icon-close-btn" type="button" aria-label="Close session ready popup" (click)="closeSessionReadyPopup()">
+          ×
+        </button>
+      </div>
+
+      <p class="session-ready-copy">Share this code with your teammates.</p>
+      <div class="session-ready-code">{{ latestSessionCode }}</div>
+      <p class="session-ready-link">{{ latestJoinUrl }}</p>
+
+      <div class="actions-row">
+        <button class="card-action-btn" type="button" (click)="copyLatestJoinUrl()">Copy share link</button>
+        <button class="card-action-btn muted" type="button" (click)="goToSprint(latestSessionCode)">Open board</button>
+      </div>
+    </section>
+  </div>
+}
+
 @if (isLoading) {
   <p>Loading sprints...</p>
 }
@@ -45,17 +103,15 @@
             <button class="card-action-btn muted" type="button" (click)="cancelEditingGoal()">Cancel</button>
           </div>
         } @else {
-          <button class="sprint-open-btn" type="button" (click)="goToSprint(s.id)">
+          <button class="sprint-open-btn" type="button" (click)="goToSprint(s.sessionCode)">
             <h2>{{ s.goal }}</h2>
             <p>{{ s.startDate | date }} - {{ s.endDate | date }}</p>
+            <p>Session code: {{ s.sessionCode }}</p>
           </button>
           <button class="card-action-btn" type="button" (click)="startEditingGoal(s)">Edit goal</button>
         }
       </article>
     }
-    <button class="sprint-card sprint-add-btn" type="button" (click)="addSprint()">
-      <h2>+ Add Sprint</h2>
-    </button>
   </div>
 </div>
 
@@ -73,14 +129,14 @@
       aria-labelledby="create-sprint-title"
     >
       <div class="create-modal-header">
-        <h2 id="create-sprint-title">Create sprint</h2>
+        <h2 id="create-sprint-title">Create sprint session</h2>
         <button class="icon-close-btn" type="button" aria-label="Close create sprint form" (click)="cancelSprintCreation()">
           ×
         </button>
       </div>
 
       <form class="create-form" (ngSubmit)="createSprint()">
-        <label class="field-label" for="new-title">Sprint title</label>
+        <label class="field-label" for="new-title">Sprint session title</label>
         <input
           id="new-title"
           type="text"
@@ -112,7 +168,7 @@
         }
 
         <div class="actions-row">
-          <button class="card-action-btn" type="submit">Create sprint</button>
+          <button class="card-action-btn" type="submit">Create sprint session</button>
           <button class="card-action-btn muted" type="button" (click)="cancelSprintCreation()">Cancel</button>
         </div>
       </form>

@@ -6,7 +6,7 @@ import { Board } from './pages/board/board';
 const routes: Routes = [
   { path: '', component: Home },
   { path: 'board', redirectTo: '' },
-  { path: 'board/:id', component: Board },
+  { path: 'board/:sessionCode', component: Board },
   { path: '**', redirectTo: '' }
 ];
 

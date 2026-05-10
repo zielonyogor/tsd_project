@@ -44,7 +44,7 @@ export class Board implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
-      const boardId = paramMap.get('id');
+      const boardId = paramMap.get('sessionCode');
 
       if (!boardId) {
         void this.router.navigate(['/']);
@@ -177,18 +177,9 @@ export class Board implements OnInit {
     this.loadError = '';
 
     try {
-      const [sprints, userStories] = await Promise.all([
-        this.service.getSprints(),
-        this.service.getStories(boardId),
-      ]);
-      const sprint = sprints.find(item => item.id === boardId);
-
-      if (!sprint) {
-        void this.router.navigate(['/']);
-        return;
-      }
-
-      this.sprint = sprint;
+      const session = await this.service.joinSprintSession(boardId);
+      this.sprint = session.sprint;
+      const userStories = await this.service.getStories(session.sprint.id);
       this.userStories = userStories;
       this.cdr.markForCheck();
     } catch {

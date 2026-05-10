@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { convertToParamMap } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
 
 import { FAKE_SPRINT_BOARDS, FAKE_SPRINTS } from '../../data/fake-sprint-boards';
 
@@ -12,21 +11,51 @@ describe('Board', () => {
   let component: Board;
   let fixture: ComponentFixture<Board>;
   let navigateCalls: unknown[][];
-  let paramMapSubject: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
+  let paramMapStream: {
+    subscribe: (callback: (value: ReturnType<typeof convertToParamMap>) => void) => { unsubscribe: () => void };
+    next: (value: ReturnType<typeof convertToParamMap>) => void;
+  };
 
   const mockSprintService = {
     getSprints: vi.fn(),
     getStories: vi.fn(),
+    joinSprintSession: vi.fn(),
     createUserStory: vi.fn(),
     updateUserStory: vi.fn()
   };
 
   beforeEach(async () => {
     navigateCalls = [];
-    paramMapSubject = new BehaviorSubject(convertToParamMap({ id: '1' }));
+    const listeners: Array<(value: ReturnType<typeof convertToParamMap>) => void> = [];
+    paramMapStream = {
+      subscribe: (callback) => {
+        listeners.push(callback);
+        callback(convertToParamMap({ sessionCode: 'ABCD1234' }));
+
+        return {
+          unsubscribe: () => {
+            const index = listeners.indexOf(callback);
+
+            if (index !== -1) {
+              listeners.splice(index, 1);
+            }
+          },
+        };
+      },
+      next: (value) => {
+        for (const listener of listeners) {
+          listener(value);
+        }
+      },
+    };
 
     vi.clearAllMocks();
     mockSprintService.getSprints.mockResolvedValue(FAKE_SPRINTS);
+    mockSprintService.joinSprintSession.mockResolvedValue({
+      sprint: FAKE_SPRINT_BOARDS['1'].sprint,
+      accessToken: 'token',
+      joinUrl: '/board/ABCD1234',
+    });
     mockSprintService.getStories.mockResolvedValue(FAKE_SPRINT_BOARDS['1'].userStories);
     mockSprintService.createUserStory.mockImplementation((story) => 
       Promise.resolve({ ...story, id: Math.floor(Math.random() * 1000).toString() })
@@ -36,7 +65,7 @@ describe('Board', () => {
       imports: [Board],
       providers: [
         { provide: SprintService, useValue: mockSprintService },  
-        { provide: ActivatedRoute, useValue: { paramMap: paramMapSubject.asObservable() } },
+        { provide: ActivatedRoute, useValue: { paramMap: paramMapStream } },
         {
           provide: Router,
           useValue: {
@@ -60,7 +89,7 @@ describe('Board', () => {
     expect(component).toBeTruthy();
   });
 
-  it('loads sprint data from the route param id', async () => {
+  it('loads sprint data from the route session code', async () => {
     fixture.detectChanges();
     await fixture.whenStable();
     expect(component.sprint).toEqual(FAKE_SPRINT_BOARDS['1'].sprint);
@@ -72,7 +101,7 @@ describe('Board', () => {
 
   it('redirects to home when no board id is provided', async () => {
     mockSprintService.getSprints.mockResolvedValue(FAKE_SPRINTS);
-    paramMapSubject.next(convertToParamMap({}));
+    paramMapStream.next(convertToParamMap({}));
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -80,11 +109,12 @@ describe('Board', () => {
   });
 
   it('redirects to home when the board id does not exist', async () => {
-    paramMapSubject.next(convertToParamMap({ id: '999' }));
+    mockSprintService.joinSprintSession.mockRejectedValue(new Error('not found'));
+    paramMapStream.next(convertToParamMap({ sessionCode: 'NOPE0000' }));
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect(navigateCalls).toContainEqual(['/']);
+    expect(component.sprint).toBeNull();
   });
 
   it('renders the selected sprint goal and user stories', async () => {

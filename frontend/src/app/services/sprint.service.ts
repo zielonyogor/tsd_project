@@ -7,6 +7,9 @@ import { UserStory } from '../../types/userStory';
 export class SprintService {
     getSprints() { return api.getSprintsFromBackend(); }
     getStories(id: string) { return api.getUserStoriesBySprintFromBackend(id); }
+    joinSprintSession(sessionCode: string) {
+        return api.joinSprintSessionFromBackend(sessionCode);
+    }
     createSprint(sprint: Sprint) {
         return api.createSprintFromBackend(sprint);
     }

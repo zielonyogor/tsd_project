@@ -19,6 +19,11 @@ export class Home implements OnInit {
   protected isCreatingSprint = false;
   protected createError = '';
   protected editSprintError = '';
+  protected joinSessionCode = '';
+  protected joinSessionError = '';
+  protected latestSessionCode = '';
+  protected latestJoinUrl = '';
+  protected showSessionReadyPopup = false;
   protected editingSprintId: string | null = null;
   protected editingGoal = '';
   protected editingStartDate = '';
@@ -38,8 +43,20 @@ export class Home implements OnInit {
     void this.loadSprints();
   }
 
-  goToSprint(sprintId: string): void {
-    void this.router.navigate(['/board', sprintId]);
+  goToSprint(sessionCode: string): void {
+    void this.router.navigate(['/board', sessionCode]);
+  }
+
+  joinSprintSession(): void {
+    const sessionCode = this.joinSessionCode.trim().toUpperCase();
+
+    if (!sessionCode) {
+      this.joinSessionError = 'Please provide a sprint session code.';
+      return;
+    }
+
+    this.joinSessionError = '';
+    void this.router.navigate(['/board', sessionCode]);
   }
 
   addSprint(): void {
@@ -67,7 +84,7 @@ export class Home implements OnInit {
     const endDate = this.parseDate(this.newSprintForm.endDate);
 
     if (!title || !startDate || !endDate) {
-      this.createError = 'Please provide sprint title, start date and end date.';
+      this.createError = 'Please provide sprint session title, start date and end date.';
       return;
     }
 
@@ -82,17 +99,22 @@ export class Home implements OnInit {
       goal: title,
       startDate,
       endDate,
+      sessionCode: '',
     };
 
     void (async () => {
       try {
-        const createdSprint = await this.service.createSprint(sprint);
-        this.sprints.push(createdSprint);
+        const createdSession = await this.service.createSprint(sprint);
+        this.sprints.push(createdSession.sprint);
+        this.latestSessionCode = createdSession.sprint.sessionCode;
+        this.latestJoinUrl = createdSession.joinUrl;
+        this.joinSessionCode = createdSession.sprint.sessionCode;
+        this.showSessionReadyPopup = true;
         this.isCreatingSprint = false;
         this.createError = '';
         this.cdr.markForCheck();
       } catch {
-        this.createError = 'Failed to create sprint. Please try again.';
+        this.createError = 'Failed to create sprint session. Please try again.';
         this.cdr.markForCheck();
       }
     })();
@@ -152,6 +174,10 @@ export class Home implements OnInit {
     })();
   }
 
+  closeSessionReadyPopup(): void {
+    this.showSessionReadyPopup = false;
+  }
+
   private parseDate(value: string): Date | null {
     if (!value) {
       return null;
@@ -186,6 +212,12 @@ export class Home implements OnInit {
     }
 
     return String(maxId + 1);
+  }
+
+  protected copyLatestJoinUrl(): void {
+    if (this.latestJoinUrl) {
+      void navigator.clipboard?.writeText(this.latestJoinUrl);
+    }
   }
 
   private async loadSprints(): Promise<void> {

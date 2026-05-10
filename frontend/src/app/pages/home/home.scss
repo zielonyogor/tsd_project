@@ -175,6 +175,37 @@
     }
 }
 
+.session-ready-modal {
+    width: min(100%, 420px);
+}
+
+.session-ready-copy {
+    margin: 0;
+    color: #334155;
+}
+
+.session-ready-code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 16px 18px;
+    border-radius: 12px;
+    background: #d8eafe;
+    color: #0f172a;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-align: center;
+}
+
+.session-ready-link {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #475569;
+    word-break: break-all;
+}
+
 .icon-close-btn {
     border: none;
     background: transparent;
