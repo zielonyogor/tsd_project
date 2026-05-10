@@ -41,8 +41,8 @@ jobs:
 
       - name: Save Docker Images to tar
         run: |
-          docker save tsd-backend:${{ steps.version.outputs.tag }} | gzip > tsd-backend.tar.gz
-          docker save tsd-frontend:${{ steps.version.outputs.tag }} | gzip > tsd-frontend.tar.gz
+          docker save tsd-backend:${{ steps.version.outputs.tag }} tsd-backend:latest | gzip > tsd-backend.tar.gz
+          docker save tsd-frontend:${{ steps.version.outputs.tag }} tsd-frontend:latest | gzip > tsd-frontend.tar.gz
 
       - name: Package Release Zip
         run: |
