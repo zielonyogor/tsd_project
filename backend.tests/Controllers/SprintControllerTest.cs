@@ -12,23 +12,77 @@ namespace SprintTracker.Tests.Controllers
 {
     public class SprintControllerTests
     {
-
         [Fact]
-        public void GetSprints_ShouldReturnOk_WithListOfSprints()
+        public void GetSprintsForUser_ShouldReturnOk_WithSprintsForThatUser()
         {
             using var context = GetDatabaseContext();
-            var mapperMock = new Mock<SprintMapper>();
-            var controller = new SprintController(context, mapperMock.Object);
+            SeedSprintsWithMembers(context);
+            var mapper = new SprintMapper();
+            var controller = new SprintController(context, mapper);
 
-            var result = controller.GetSprints();
+            var result = controller.GetSprintsForUser(1);
 
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             var sprints = okResult.Value.Should().BeAssignableTo<IEnumerable<Sprint>>().Subject;
-            sprints.Should().HaveCountGreaterThan(0);
+            sprints.Should().HaveCount(1);
+            sprints.First().Name.Should().Be("Sprint 1");
         }
 
         [Fact]
-        public void CreateSprint_ShouldAddSprintToDatabase()
+        public void GetSprintForUser_ShouldReturnOk_WhenUserIsMember()
+        {
+            using var context = GetDatabaseContext();
+            SeedSprintsWithMembers(context);
+            var mapper = new SprintMapper();
+            var controller = new SprintController(context, mapper);
+
+            var result = controller.GetSprintForUser(1, 1);
+
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var sprint = okResult.Value.Should().BeAssignableTo<Sprint>().Subject;
+            sprint.Id.Should().Be(1);
+            sprint.Name.Should().Be("Sprint 1");
+        }
+
+        [Fact]
+        public void GetSprintForUser_ShouldReturnNotFound_WhenUserIsNotMember()
+        {
+            using var context = GetDatabaseContext();
+            SeedSprintsWithMembers(context);
+            var mapper = new SprintMapper();
+            var controller = new SprintController(context, mapper);
+
+            var result = controller.GetSprintForUser(1, 2);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public void CreateSprint_ShouldAddSprintToDatabase_AndAutoJoinCreator()
+        {
+            using var context = GetDatabaseContext();
+            SeedUsers(context);
+            var mapper = new SprintMapper();
+            var controller = new SprintController(context, mapper);
+            var request = new CreateSprintRequest
+            {
+                Name = "New Sprint",
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(14),
+                CreatorUserId = 1
+            };
+
+            var result = controller.CreateSprint(request);
+
+            result.Should().BeOfType<CreatedAtActionResult>();
+            context.Sprints.Should().Contain(s => s.Name == "New Sprint");
+            
+            var newSprint = context.Sprints.First(s => s.Name == "New Sprint");
+            context.SprintMembers.Should().Contain(sm => sm.SprintId == newSprint.Id && sm.UserId == 1);
+        }
+
+        [Fact]
+        public void CreateSprint_ShouldReturnBadRequest_WhenCreatorUserDoesNotExist()
         {
             using var context = GetDatabaseContext();
             var mapper = new SprintMapper();
@@ -37,26 +91,28 @@ namespace SprintTracker.Tests.Controllers
             {
                 Name = "New Sprint",
                 StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddDays(14)
+                EndDate = DateTime.UtcNow.AddDays(14),
+                CreatorUserId = 99
             };
 
             var result = controller.CreateSprint(request);
 
-            result.Should().BeOfType<CreatedAtActionResult>();
-            context.Sprints.Should().Contain(s => s.Name == "New Sprint");
+            result.Should().BeOfType<BadRequestObjectResult>();
         }
 
         [Fact]
         public void UpdateSprint_ShouldModifyExistingSprint()
         {
             using var context = GetDatabaseContext();
+            SeedSprints(context);
             var mapper = new SprintMapper();
             var controller = new SprintController(context, mapper);
             var request = new CreateSprintRequest
             {
                 Name = "Updated Sprint",
                 StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddDays(14)
+                EndDate = DateTime.UtcNow.AddDays(14),
+                CreatorUserId = 1
             };
 
             var result = controller.UpdateSprint(1, request);
@@ -72,13 +128,29 @@ namespace SprintTracker.Tests.Controllers
                 .Options;
             var databaseContext = new AppDbContext(options);
             databaseContext.Database.EnsureCreated();
-            SeedSprints(databaseContext);
             return databaseContext;
         }
 
         private void SeedSprints(AppDbContext context)
         {
             context.Sprints.Add(new Sprint { Id = 1, Name = "Sprint 1" });
+            context.SaveChanges();
+        }
+
+        private void SeedUsers(AppDbContext context)
+        {
+            context.Users.Add(new User { Id = 1, Name = "Alice" });
+            context.SaveChanges();
+        }
+
+        private void SeedSprintsWithMembers(AppDbContext context)
+        {
+            context.Users.AddRange(
+                new User { Id = 1, Name = "Alice" },
+                new User { Id = 2, Name = "Bob" }
+            );
+            context.Sprints.Add(new Sprint { Id = 1, Name = "Sprint 1" });
+            context.SprintMembers.Add(new SprintMember { Id = 1, SprintId = 1, UserId = 1 });
             context.SaveChanges();
         }
     }
