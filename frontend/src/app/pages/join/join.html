@@ -1,6 +1,9 @@
 <div class="join-page">
   <h1 class="title">Join Sprint</h1>
-  <p>Enter a sprint join code or use a shared link.</p>
+  <p>
+    Signed in as <strong>{{ currentUser?.name }}</strong>.
+    Enter the sprint code below.
+  </p>
 
   <form class="join-card" (ngSubmit)="joinSprint()">
     <label class="field-label" for="join-code">Sprint join code</label>
@@ -18,7 +21,7 @@
 
     <div class="actions-row">
       <button class="card-action-btn" type="submit" [disabled]="isJoining">
-        {{isJoining ? 'Joining…' : 'Join sprint'}}
+        {{ isJoining ? 'Joining…' : 'Join sprint' }}
       </button>
       <button class="card-action-btn muted" type="button" (click)="goBack()">Back</button>
     </div>

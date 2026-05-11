@@ -1,5 +1,15 @@
 <h1 class="title">Your sprints</h1>
 
+<div class="home-header">
+  <div>
+    <h1 class="title">Your sprints</h1>
+    @if (currentUser) {
+      <p>Signed in as {{ currentUser.name }}</p>
+    }
+  </div>
+  <button class="card-action-btn muted" type="button" (click)="logout()">Logout</button>
+</div>
+
 <div class="home-actions">
   <button class="card-action-btn" type="button" (click)="openJoin()">Join sprint</button>
 </div>

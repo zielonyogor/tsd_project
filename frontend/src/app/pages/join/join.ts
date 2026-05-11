@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, type ParamMap } from '@angular/router';
 import { SprintService } from '../../services/sprint.service';
+import type { User } from '../../../types/user';
+import { getCurrentUser } from '../../data/user-storage';
 
 @Component({
   selector: 'app-join',
@@ -14,6 +16,7 @@ export class Join implements OnInit {
   protected joinCode = '';
   protected joinError = '';
   protected isJoining = false;
+  protected currentUser: User | null = null;
 
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -21,6 +24,12 @@ export class Join implements OnInit {
   private readonly service = inject(SprintService);
 
   ngOnInit(): void {
+    this.currentUser = getCurrentUser();
+    if (!this.currentUser) {
+      void this.router.navigate(['/login']);
+      return;
+    }
+
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       const code = paramMap.get('code');
       if (code) {
@@ -30,6 +39,11 @@ export class Join implements OnInit {
   }
 
   protected async joinSprint(): Promise<void> {
+    if (!this.currentUser) {
+      this.joinError = 'Log in first.';
+      return;
+    }
+
     const code = this.joinCode.trim();
     if (!code) {
       this.joinError = 'Enter a sprint join code.';
@@ -40,10 +54,11 @@ export class Join implements OnInit {
     this.isJoining = true;
 
     try {
-      const sprint = await this.service.joinSprint(code, 1);
+      const sprint = await this.service.joinSprint(code, this.currentUser.id);
       void this.router.navigate(['/board', sprint.id]);
-    } catch {
-      this.joinError = 'Could not join sprint. Check the code and try again.';
+    } catch (error) {
+      console.error('Join sprint failed', error);
+      this.joinError = 'Could not join sprint. See console for details.';
     } finally {
       this.isJoining = false;
       this.cdr.markForCheck();

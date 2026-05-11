@@ -7,6 +7,8 @@ import { USER_STORY_STATUSES, UserStoryStatus, type UserStory } from '../../../t
 import { UserStoryCard } from './components/user-story-card/user-story-card';
 import { ProgressBar } from './components/progress-bar/progress-bar';
 import { SprintService } from './../../services/sprint.service';
+import type { User } from '../../../types/user';
+import { getCurrentUser } from '../../data/user-storage';
 
 @Component({
   selector: 'app-board',
@@ -15,6 +17,7 @@ import { SprintService } from './../../services/sprint.service';
   imports: [DatePipe, FormsModule, UserStoryCard, ProgressBar],
 })
 export class Board implements OnInit {
+  protected currentUser: User | null = null;
   protected readonly columns = USER_STORY_STATUSES;
   protected readonly newStoryForm = {
     title: '',
@@ -43,9 +46,14 @@ export class Board implements OnInit {
   private readonly service = inject(SprintService);
 
   ngOnInit(): void {
+    this.currentUser = getCurrentUser();
+    if (!this.currentUser) {
+      void this.router.navigate(['/login']);
+      return;
+    }
+
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       const boardId = paramMap.get('id');
-
       if (!boardId) {
         void this.router.navigate(['/']);
         return;
@@ -185,24 +193,15 @@ export class Board implements OnInit {
     this.loadError = '';
 
     try {
-      const [sprints, userStories] = await Promise.all([
-        this.service.getSprints(),
-        this.service.getStories(boardId),
-      ]);
-      const sprint = sprints.find(item => item.id === boardId);
-
-      if (!sprint) {
-        void this.router.navigate(['/']);
-        return;
-      }
-
+      const sprint = await this.service.getSprintForUser(boardId, this.currentUser!.id);
       this.sprint = sprint;
-      this.userStories = userStories;
+      this.userStories = await this.service.getStories(boardId);
       this.cdr.markForCheck();
     } catch {
       this.loadError = 'Could not load sprint board from backend.';
       this.sprint = null;
       this.userStories = [];
+      void this.router.navigate(['/']);
     } finally {
       this.isLoading = false;
       this.cdr.markForCheck();

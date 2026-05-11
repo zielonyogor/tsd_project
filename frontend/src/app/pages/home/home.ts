@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import type { Sprint } from '../../../types/sprint';
 import { SprintService } from '../../services/sprint.service';
+import type { User } from '../../../types/user';
+import { getCurrentUser, clearCurrentUser } from '../../data/user-storage';
 
 @Component({
   selector: 'app-home',
@@ -12,6 +14,7 @@ import { SprintService } from '../../services/sprint.service';
   imports: [DatePipe, FormsModule, CommonModule],
 })
 export class Home implements OnInit {
+  protected currentUser: User | null = null;
   protected sprints: Sprint[] = [];
   protected isLoading = false;
   protected loadError = '';
@@ -35,7 +38,18 @@ export class Home implements OnInit {
   private readonly service = inject(SprintService);
 
   ngOnInit(): void {
+    this.currentUser = getCurrentUser();
+    if (!this.currentUser) {
+      void this.router.navigate(['/login']);
+      return;
+    }
+
     void this.loadSprints();
+  }
+
+  protected logout(): void {
+    clearCurrentUser();
+    void this.router.navigate(['/login']);
   }
 
   goToSprint(sprintId: string): void {
@@ -86,7 +100,7 @@ export class Home implements OnInit {
 
     void (async () => {
       try {
-        const createdSprint = await this.service.createSprint(sprint);
+        const createdSprint = await this.service.createSprint(sprint, this.currentUser!.id);
         this.sprints.push(createdSprint);
         this.isCreatingSprint = false;
         this.createError = '';
@@ -193,7 +207,7 @@ export class Home implements OnInit {
     this.loadError = '';
 
     try {
-      this.sprints = await this.service.getSprints();
+      this.sprints = await this.service.getSprintsForUser(this.currentUser!.id);
     } catch {
       this.loadError = 'Could not load sprints from backend.';
       this.sprints = [];

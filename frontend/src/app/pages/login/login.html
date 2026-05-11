@@ -1,0 +1,25 @@
+<div class="login-page">
+  <h1 class="title">Sign in</h1>
+  <p>Type your username to log in or create a new account.</p>
+
+  <form class="login-card" (ngSubmit)="login()">
+    <label class="field-label" for="login-name">Username</label>
+    <input
+      id="login-name"
+      type="text"
+      class="field-input"
+      [(ngModel)]="userName"
+      name="userName"
+    />
+
+    @if (loginError) {
+      <p class="error-msg">{{ loginError }}</p>
+    }
+
+    <div class="actions-row">
+      <button class="card-action-btn" type="submit" [disabled]="isLoggingIn">
+        {{ isLoggingIn ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </div>
+  </form>
+</div>

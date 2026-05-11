@@ -125,5 +125,26 @@ namespace SprintTracker.Controllers
 
             return CreatedAtAction(nameof(CreateUser), new { id = user.Id }, user);
         }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] CreateUserRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                return BadRequest("User name is required");
+            }
+
+            var normalized = request.Name.Trim();
+            var user = _context.Users.FirstOrDefault(u => u.Name == normalized);
+
+            if (user == null)
+            {
+                user = new User { Name = normalized };
+                _context.Users.Add(user);
+                _context.SaveChanges();
+            }
+
+            return Ok(user);
+        }
     }
 }
