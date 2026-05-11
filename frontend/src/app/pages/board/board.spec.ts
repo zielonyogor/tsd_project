@@ -8,6 +8,10 @@ import { FAKE_SPRINT_BOARDS, FAKE_SPRINTS } from '../../data/fake-sprint-boards'
 import { Board } from './board';
 import { SprintService } from '../../services/sprint.service';
 
+import { of } from 'rxjs';
+
+
+
 describe('Board', () => {
   let component: Board;
   let fixture: ComponentFixture<Board>;
@@ -39,12 +43,9 @@ describe('Board', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            paramMap: paramMapSubject.asObservable(),
-            snapshot: {
-              paramMap: convertToParamMap({ id: '1' }),
-            },
+            paramMap: of(convertToParamMap({ id: '1' })),
           },
-        },
+        }, 
         {
           provide: Router,
           useValue: {
