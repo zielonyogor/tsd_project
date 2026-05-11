@@ -35,8 +35,16 @@ describe('Board', () => {
     await TestBed.configureTestingModule({
       imports: [Board],
       providers: [
-        { provide: SprintService, useValue: mockSprintService },  
-        { provide: ActivatedRoute, useValue: { paramMap: paramMapSubject.asObservable() } },
+        { provide: SprintService, useValue: mockSprintService },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            paramMap: paramMapSubject.asObservable(),
+            snapshot: {
+              paramMap: convertToParamMap({ id: '1' }),
+            },
+          },
+        },
         {
           provide: Router,
           useValue: {
@@ -46,7 +54,7 @@ describe('Board', () => {
             },
           },
         },
-      ],
+      ], 
     }).compileComponents();
 
     fixture = TestBed.createComponent(Board);
@@ -281,6 +289,7 @@ describe('Board', () => {
       };
     };
 
+
     board.newStoryForm.title = 'Previous title';
     board.newStoryForm.description = 'Previous description';
     board.newStoryForm.status = 'Done';
@@ -326,5 +335,21 @@ describe('Board', () => {
     const lastStory = inProgressStories[inProgressStories.length - 1];
 
     expect(lastStory.title).toBe('Second story');
+  });
+
+  it('loads sprint data from the route param id', async () => {
+    fixture.detectChanges();
+
+    await Promise.resolve(); // <-- KLUCZOWE
+    await fixture.whenStable();
+
+    fixture.detectChanges();
+
+    expect(component.sprint).toEqual(FAKE_SPRINT_BOARDS['1'].sprint);
+    expect(component.getUserStoriesForColumn('To Do')).toEqual([
+      FAKE_SPRINT_BOARDS['1'].userStories[0],
+    ]);
+
+    expect(navigateCalls).toEqual([]);
   });
 });
