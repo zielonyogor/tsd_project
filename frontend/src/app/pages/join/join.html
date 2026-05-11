@@ -1,0 +1,26 @@
+<div class="join-page">
+  <h1 class="title">Join Sprint</h1>
+  <p>Enter a sprint join code or use a shared link.</p>
+
+  <form class="join-card" (ngSubmit)="joinSprint()">
+    <label class="field-label" for="join-code">Sprint join code</label>
+    <input
+      id="join-code"
+      type="text"
+      class="field-input"
+      [(ngModel)]="joinCode"
+      name="joinCode"
+    />
+
+    @if (joinError) {
+      <p class="error-msg">{{ joinError }}</p>
+    }
+
+    <div class="actions-row">
+      <button class="card-action-btn" type="submit" [disabled]="isJoining">
+        {{isJoining ? 'Joining…' : 'Join sprint'}}
+      </button>
+      <button class="card-action-btn muted" type="button" (click)="goBack()">Back</button>
+    </div>
+  </form>
+</div>

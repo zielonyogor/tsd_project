@@ -35,6 +35,7 @@ function toSprint(dto: SprintApiResponse): Sprint {
     goal: dto.name ?? 'Untitled sprint',
     startDate: new Date(dto.startDate),
     endDate: new Date(dto.endDate),
+    joinCode: dto.joinCode ?? undefined,
   };
 }
 
@@ -131,4 +132,19 @@ export async function updateUserStoryFromBackend(story: UserStory): Promise<void
   if (!response.ok) {
     throw new Error(`Failed to update user story: ${response.status} ${response.statusText}`);
   }
+}
+
+export async function joinSprintFromBackend(joinCode: string, userId: number): Promise<Sprint> {
+  const response = await fetch(`${backendUrl}/Sprint/join`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ joinCode, userId }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to join sprint: ${response.status} ${response.statusText}`);
+  }
+
+  const result = (await response.json()) as { Sprint: SprintApiResponse };
+  return toSprint(result.Sprint);
 }

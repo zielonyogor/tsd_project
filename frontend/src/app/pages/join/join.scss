@@ -1,0 +1,59 @@
+:host {
+  display: flex;
+  justify-content: center;
+  padding: 36px;
+}
+
+.join-page {
+  width: min(100%, 460px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.join-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  border-radius: 14px;
+  border: 1px solid #cbd5e1;
+  background: #eef6ff;
+}
+
+.field-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.field-input {
+  border: 1px solid #93b7e0;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 0.95rem;
+}
+
+.actions-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-action-btn {
+  border: none;
+  color: #fff;
+  background-color: #2563eb;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.card-action-btn.muted {
+  background-color: #64748b;
+}
+
+.error-msg {
+  color: #9b1c1c;
+  margin: 0;
+}

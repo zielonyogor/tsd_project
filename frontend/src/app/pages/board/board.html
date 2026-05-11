@@ -93,6 +93,19 @@
     </div>
 }
 
+@if (sprint.joinCode) {
+  <div class="share-box">
+    <p>
+      Join code:
+      <strong>{{ sprint.joinCode }}</strong>
+    </p>
+    <p>
+      Share link:
+      <a href="{{ joinUrl }}">{{ joinUrl }}</a>
+    </p>
+  </div>
+}
+
 @if (isEditingStory) {
     <div
         class="create-modal-backdrop"

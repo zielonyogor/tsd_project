@@ -49,6 +49,39 @@ namespace SprintTracker.Controllers
             return Ok(new { Message = "Joined sprint successfully", Sprint = sprint });
         }
 
+        [HttpPost("Sprint/join")]
+        public IActionResult JoinSprintByCode([FromBody] JoinSprintByCodeRequest request)
+        {
+            var sprint = _context.Sprints.FirstOrDefault(s => s.JoinCode == request.JoinCode);
+            if (sprint == null)
+            {
+                return NotFound("Sprint not found");
+            }
+
+            var user = _context.Users.Find(request.UserId);
+            if (user == null)
+            {
+                return BadRequest("User not found");
+            }
+
+            var existingMember = _context.SprintMembers
+                .FirstOrDefault(sm => sm.SprintId == sprint.Id && sm.UserId == request.UserId);
+            if (existingMember != null)
+            {
+                return BadRequest("User is already a member of this sprint");
+            }
+
+            var sprintMember = new SprintMember
+            {
+                UserId = request.UserId,
+                SprintId = sprint.Id
+            };
+            _context.SprintMembers.Add(sprintMember);
+            _context.SaveChanges();
+
+            return Ok(new { Message = "Joined sprint successfully", Sprint = sprint });
+        }
+
         [HttpGet("Sprint/{id}/members")]
         public IActionResult GetSprintMembers(int id)
         {

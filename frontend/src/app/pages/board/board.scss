@@ -157,3 +157,21 @@
 .card-action-btn.muted {
   background: #8198b7;
 }
+
+.share-box {
+  margin: 20px 0;
+  padding: 16px;
+  border-radius: 12px;
+  background: #eef6ff;
+  border: 1px solid #cbd5e1;
+
+  p {
+    margin: 0;
+    color: #1f2937;
+  }
+
+  a {
+    color: #2563eb;
+    word-break: break-all;
+  }
+}

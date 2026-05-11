@@ -55,6 +55,14 @@ export class Board implements OnInit {
     });
   }
 
+  protected get joinUrl(): string {
+    if (!this.sprint?.joinCode) {
+      return '';
+    }
+
+    return `${globalThis.location.origin}/join/${this.sprint.joinCode}`;
+  }
+
   public getUserStoriesForColumn(status: UserStoryStatus): UserStory[] {
     return this.userStories.filter(story => story.status === status);
   }

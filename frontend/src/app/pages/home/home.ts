@@ -202,4 +202,8 @@ export class Home implements OnInit {
       this.cdr.markForCheck();
     }
   }
+
+  protected openJoin(): void {
+    void this.router.navigate(['/join']);
+  }
 }
