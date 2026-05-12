@@ -2,10 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 
 import { FAKE_SPRINT_BOARDS, FAKE_SPRINTS, type SprintBoardData } from '../../data/fake-sprint-boards';
+import { clearCurrentUser, saveCurrentUser } from '../../data/user-storage';
 
 import { Home } from './home';
 import { SprintService } from '../../services/sprint.service';
-import { ActivatedRoute } from '@angular/router';
 
 
 describe('Home', () => {
@@ -68,6 +68,8 @@ describe('Home', () => {
 
   beforeEach(async () => {
     restoreBoards(baselineBoards);
+    clearCurrentUser();
+    saveCurrentUser({ id: 1, name: 'Alice' });
 
     vi.clearAllMocks();
 
@@ -102,6 +104,10 @@ describe('Home', () => {
 
   afterAll(() => {
     restoreBoards(baselineBoards);
+  });
+
+  afterEach(() => {
+    clearCurrentUser();
   });
 
   it('should create', () => {

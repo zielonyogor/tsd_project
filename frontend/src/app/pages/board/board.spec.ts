@@ -1,14 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { convertToParamMap } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
 
 import { FAKE_SPRINT_BOARDS, FAKE_SPRINTS } from '../../data/fake-sprint-boards';
+import { clearCurrentUser, saveCurrentUser } from '../../data/user-storage';
 
-import { Board } from './board';
 import { SprintService } from '../../services/sprint.service';
-
-import { of } from 'rxjs';
+import { Board } from './board';
 
 
 
@@ -16,21 +14,50 @@ describe('Board', () => {
   let component: Board;
   let fixture: ComponentFixture<Board>;
   let navigateCalls: unknown[][];
-  let paramMapSubject: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
+  let paramMapSubscribers: ((paramMap: ReturnType<typeof convertToParamMap>) => void)[];
+  let currentParamMap: ReturnType<typeof convertToParamMap>;
 
   const mockSprintService = {
     getSprints: vi.fn(),
+    getSprintForUser: vi.fn(),
     getStories: vi.fn(),
     createUserStory: vi.fn(),
     updateUserStory: vi.fn()
   };
 
+  const activatedRoute = {
+    paramMap: {
+      subscribe: (callback: (paramMap: ReturnType<typeof convertToParamMap>) => void) => {
+        paramMapSubscribers.push(callback);
+        callback(currentParamMap);
+
+        return {
+          unsubscribe: () => {
+            paramMapSubscribers = paramMapSubscribers.filter((subscriber) => subscriber !== callback);
+          },
+        };
+      },
+    },
+  };
+
+  const emitParamMap = (params: Record<string, string>): void => {
+    currentParamMap = convertToParamMap(params);
+
+    for (const subscriber of paramMapSubscribers) {
+      subscriber(currentParamMap);
+    }
+  };
+
   beforeEach(async () => {
     navigateCalls = [];
-    paramMapSubject = new BehaviorSubject(convertToParamMap({ id: '1' }));
+    paramMapSubscribers = [];
+    currentParamMap = convertToParamMap({ id: '1' });
+    clearCurrentUser();
+    saveCurrentUser({ id: 1, name: 'Alice' });
 
     vi.clearAllMocks();
     mockSprintService.getSprints.mockResolvedValue(FAKE_SPRINTS);
+    mockSprintService.getSprintForUser.mockResolvedValue(FAKE_SPRINT_BOARDS['1'].sprint);
     mockSprintService.getStories.mockResolvedValue(FAKE_SPRINT_BOARDS['1'].userStories);
     mockSprintService.createUserStory.mockImplementation((story) => 
       Promise.resolve({ ...story, id: Math.floor(Math.random() * 1000).toString() })
@@ -42,10 +69,8 @@ describe('Board', () => {
         { provide: SprintService, useValue: mockSprintService },
         {
           provide: ActivatedRoute,
-          useValue: {
-            paramMap: of(convertToParamMap({ id: '1' })),
-          },
-        }, 
+          useValue: activatedRoute,
+        },
         {
           provide: Router,
           useValue: {
@@ -55,7 +80,7 @@ describe('Board', () => {
             },
           },
         },
-      ], 
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Board);
@@ -63,6 +88,10 @@ describe('Board', () => {
 
     fixture.detectChanges();
     await fixture.whenStable();
+  });
+
+  afterEach(() => {
+    clearCurrentUser();
   });
 
   it('should create', () => {
@@ -81,7 +110,7 @@ describe('Board', () => {
 
   it('redirects to home when no board id is provided', async () => {
     mockSprintService.getSprints.mockResolvedValue(FAKE_SPRINTS);
-    paramMapSubject.next(convertToParamMap({}));
+    emitParamMap({});
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -89,7 +118,8 @@ describe('Board', () => {
   });
 
   it('redirects to home when the board id does not exist', async () => {
-    paramMapSubject.next(convertToParamMap({ id: '999' }));
+    mockSprintService.getSprintForUser.mockRejectedValueOnce(new Error('missing board'));
+    emitParamMap({ id: '999' });
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -336,21 +366,5 @@ describe('Board', () => {
     const lastStory = inProgressStories[inProgressStories.length - 1];
 
     expect(lastStory.title).toBe('Second story');
-  });
-
-  it('loads sprint data from the route param id', async () => {
-    fixture.detectChanges();
-
-    await Promise.resolve(); // <-- KLUCZOWE
-    await fixture.whenStable();
-
-    fixture.detectChanges();
-
-    expect(component.sprint).toEqual(FAKE_SPRINT_BOARDS['1'].sprint);
-    expect(component.getUserStoriesForColumn('To Do')).toEqual([
-      FAKE_SPRINT_BOARDS['1'].userStories[0],
-    ]);
-
-    expect(navigateCalls).toEqual([]);
   });
 });

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+
 using SprintTracker.Database.Data;
 using SprintTracker.Database.Models;
 using SprintTracker.DTO.Requests;
