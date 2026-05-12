@@ -8,7 +8,7 @@ import { getCurrentUser, saveCurrentUser } from '../../data/user-storage';
 @Component({
   selector: 'app-login',
   templateUrl: './login.html',
-//   styleUrl: './login.scss',
+  styleUrl: './login.scss',
   imports: [CommonModule, FormsModule],
 })
 export class Login implements OnInit {

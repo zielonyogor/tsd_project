@@ -1,6 +1,8 @@
 <div class="login-page">
-  <h1 class="title">Sign in</h1>
-  <p>Type your username to log in or create a new account.</p>
+  <header class="login-header">
+    <h1 class="title">Sign in</h1>
+    <p>Use your username to continue.</p>
+  </header>
 
   <form class="login-card" (ngSubmit)="login()">
     <label class="field-label" for="login-name">Username</label>
@@ -10,6 +12,10 @@
       class="field-input"
       [(ngModel)]="userName"
       name="userName"
+      autocomplete="username"
+      autocapitalize="none"
+      spellcheck="false"
+      required
     />
 
     @if (loginError) {

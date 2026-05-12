@@ -1,18 +1,69 @@
-<h1 class="title">Your sprints</h1>
-
-<div class="home-header">
-  <div>
+<header class="home-header">
+  <div class="home-header-copy">
     <h1 class="title">Your sprints</h1>
     @if (currentUser) {
       <p>Signed in as {{ currentUser.name }}</p>
     }
   </div>
-  <button class="card-action-btn muted" type="button" (click)="logout()">Logout</button>
-</div>
 
-<div class="home-actions">
-  <button class="card-action-btn" type="button" (click)="openJoin()">Join sprint</button>
-</div>
+  <div class="home-header-actions">
+    <button class="card-action-btn" type="button" (click)="openJoin()">Join sprint</button>
+    <button class="card-action-btn muted" type="button" (click)="logout()">Logout</button>
+  </div>
+</header>
+
+@if (isJoinModalOpen) {
+  <div
+    class="join-modal-backdrop"
+    tabindex="0"
+    (click)="onJoinBackdropClick($event)"
+    (keyup.enter)="cancelJoinSprint()"
+  >
+    <section
+      class="join-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="join-sprint-title"
+    >
+      <div class="join-modal-header">
+        <h2 id="join-sprint-title">Join sprint</h2>
+        <button class="icon-close-btn" type="button" aria-label="Close join sprint form" (click)="cancelJoinSprint()">
+          ×
+        </button>
+      </div>
+
+      <p class="join-modal-copy">
+        Signed in as <strong>{{ currentUser?.name }}</strong>. Enter the sprint join code below.
+      </p>
+
+      <form class="join-form" (ngSubmit)="joinSprint()">
+        <label class="field-label" for="join-code">Sprint join code</label>
+        <input
+          id="join-code"
+          type="text"
+          class="field-input"
+          [(ngModel)]="joinCode"
+          name="joinCode"
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+          required
+        />
+
+        @if (joinError) {
+          <p class="error-msg">{{ joinError }}</p>
+        }
+
+        <div class="actions-row">
+          <button class="card-action-btn" type="submit" [disabled]="isJoiningSprint">
+            {{ isJoiningSprint ? 'Joining…' : 'Join sprint' }}
+          </button>
+          <button class="card-action-btn muted" type="button" (click)="cancelJoinSprint()">Cancel</button>
+        </div>
+      </form>
+    </section>
+  </div>
+}
 
 @if (isLoading) {
   <p>Loading sprints...</p>

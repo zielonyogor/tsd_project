@@ -21,6 +21,10 @@ export class Home implements OnInit {
   private readonly todayForInput = this.formatDateForInput(new Date());
   protected isCreatingSprint = false;
   protected createError = '';
+  protected isJoinModalOpen = false;
+  protected isJoiningSprint = false;
+  protected joinCode = '';
+  protected joinError = '';
   protected editSprintError = '';
   protected editingSprintId: string | null = null;
   protected editingGoal = '';
@@ -67,6 +71,51 @@ export class Home implements OnInit {
   cancelSprintCreation(): void {
     this.isCreatingSprint = false;
     this.createError = '';
+  }
+
+  openJoin(): void {
+    this.isJoinModalOpen = true;
+    this.joinError = '';
+    this.joinCode = '';
+  }
+
+  cancelJoinSprint(): void {
+    this.isJoinModalOpen = false;
+    this.joinError = '';
+  }
+
+  onJoinBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.cancelJoinSprint();
+    }
+  }
+
+  async joinSprint(): Promise<void> {
+    if (!this.currentUser) {
+      this.joinError = 'Log in first.';
+      return;
+    }
+
+    const code = this.joinCode.trim();
+    if (!code) {
+      this.joinError = 'Enter a sprint join code.';
+      return;
+    }
+
+    this.joinError = '';
+    this.isJoiningSprint = true;
+
+    try {
+      const sprint = await this.service.joinSprint(code, this.currentUser.id);
+      this.cancelJoinSprint();
+      void this.router.navigate(['/board', sprint.id]);
+    } catch (error) {
+      console.error('Join sprint failed', error);
+      this.joinError = 'Could not join sprint. See console for details.';
+    } finally {
+      this.isJoiningSprint = false;
+      this.cdr.markForCheck();
+    }
   }
 
   onBackdropClick(event: MouseEvent): void {
@@ -217,7 +266,4 @@ export class Home implements OnInit {
     }
   }
 
-  protected openJoin(): void {
-    void this.router.navigate(['/join']);
-  }
 }
