@@ -76,7 +76,7 @@ namespace SprintTracker.Tests.Controllers
 
             result.Should().BeOfType<CreatedAtActionResult>();
             context.Sprints.Should().Contain(s => s.Name == "New Sprint");
-            
+
             var newSprint = context.Sprints.First(s => s.Name == "New Sprint");
             context.SprintMembers.Should().Contain(sm => sm.SprintId == newSprint.Id && sm.UserId == 1);
         }
