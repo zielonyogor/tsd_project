@@ -11,6 +11,9 @@
     <div class="bar-title">
         <h1 class="title">Sprint Board <span class="sprint-time">{{ sprint.startDate | date:'shortDate' }} - {{ sprint.endDate | date:'shortDate' }}</span></h1>
         <h2 class="sprint-goal">Sprint Goal: {{ sprint.goal }}</h2>
+        @if (sprint.joinCode) {
+            <p class="join-code">Join code: <strong>{{ sprint.joinCode }}</strong></p>
+        }
     </div>
 
     <button class="add-btn" (click)="onAddStory()">+ Add User Story</button>
@@ -91,6 +94,19 @@
             </form>
         </section>
     </div>
+}
+
+@if (sprint.joinCode) {
+  <div class="share-box">
+    <p>
+      Join code:
+      <strong>{{ sprint.joinCode }}</strong>
+    </p>
+    <p>
+      Share link:
+      <a href="{{ joinUrl }}">{{ joinUrl }}</a>
+    </p>
+  </div>
 }
 
 @if (isEditingStory) {

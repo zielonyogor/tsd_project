@@ -27,15 +27,25 @@ npx ng lint
 
 ## Database models
 
-The backend uses PostgreSQL with two main tables:
+The backend uses PostgreSQL with the following tables:
 
-1. `Sprints`
+1. `Users`
+	- `Id` (int, PK)
+	- `Name` (text, required)
+
+2. `Sprints`
 	- `Id` (int, PK)
 	- `Name` (text, required)
 	- `StartDate` (timestamp with time zone)
 	- `EndDate` (timestamp with time zone)
+	- `JoinCode` (text, auto-generated 6-character code)
 
-2. `UserStories`
+3. `SprintMembers` (join table)
+	- `Id` (int, PK)
+	- `UserId` (int, FK -> `Users.Id`)
+	- `SprintId` (int, FK -> `Sprints.Id`)
+
+4. `UserStories`
 	- `Id` (int, PK)
 	- `Title` (text, required)
 	- `Description` (text, required)

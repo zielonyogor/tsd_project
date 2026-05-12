@@ -35,6 +35,7 @@ function toSprint(dto: SprintApiResponse): Sprint {
     goal: dto.name ?? 'Untitled sprint',
     startDate: new Date(dto.startDate),
     endDate: new Date(dto.endDate),
+    joinCode: dto.joinCode ?? undefined,
   };
 }
 
@@ -58,7 +59,7 @@ export async function getUserStoriesBySprintFromBackend(sprintId: string): Promi
   return stories.map(toUserStory);
 }
 
-export async function createSprintFromBackend(sprint: Sprint): Promise<Sprint> {
+export async function createSprintFromBackend(sprint: Sprint, creatorUserId: number): Promise<Sprint> {
   const response = await fetch(`${backendUrl}/Sprint`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -66,6 +67,7 @@ export async function createSprintFromBackend(sprint: Sprint): Promise<Sprint> {
       name: sprint.goal,
       startDate: sprint.startDate,
       endDate: sprint.endDate,
+      creatorUserId: creatorUserId,
     }),
   });
 
@@ -131,4 +133,53 @@ export async function updateUserStoryFromBackend(story: UserStory): Promise<void
   if (!response.ok) {
     throw new Error(`Failed to update user story: ${response.status} ${response.statusText}`);
   }
+}
+
+export async function joinSprintFromBackend(joinCode: string, userId: number): Promise<Sprint> {
+  const response = await fetch(`${backendUrl}/SprintUser/Sprint/join`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ joinCode, userId }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to join sprint: ${response.status} ${response.statusText}`);
+  }
+
+  const result = await response.json() as { Sprint?: SprintApiResponse; sprint?: SprintApiResponse };
+  const sprintDto = result.Sprint ?? result.sprint;
+  if (!sprintDto) {
+    throw new Error('Invalid join response from backend');
+  }
+
+  return toSprint(sprintDto);
+}
+
+export interface UserApiResponse {
+  id: number;
+  name: string;
+}
+
+export async function loginUserFromBackend(name: string): Promise<UserApiResponse> {
+  const response = await fetch(`${backendUrl}/SprintUser/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to log in: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json() as Promise<UserApiResponse>;
+}
+
+export async function getSprintsForUserFromBackend(userId: number): Promise<Sprint[]> {
+  const sprints = await fetchJson<SprintApiResponse[]>(`/Sprint/user/${userId}`);
+  return sprints.map(toSprint);
+}
+
+export async function getSprintForUserFromBackend(sprintId: string, userId: number): Promise<Sprint> {
+  const sprint = await fetchJson<SprintApiResponse>(`/Sprint/${sprintId}/user/${userId}`);
+  return toSprint(sprint);
 }
