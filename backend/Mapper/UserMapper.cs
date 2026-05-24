@@ -1,7 +1,8 @@
-using SprintTracker.Database.Models;
-using SprintTracker.DTO.Requests;
 using System.Security.Cryptography;
 using System.Text;
+
+using SprintTracker.Database.Models;
+using SprintTracker.DTO.Requests;
 
 namespace SprintTracker.Mapper
 {
@@ -16,7 +17,7 @@ namespace SprintTracker.Mapper
             };
         }
 
-        
+
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
