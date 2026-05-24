@@ -1,8 +1,11 @@
+
+
 using Microsoft.AspNetCore.Mvc;
 
 using SprintTracker.Database.Data;
 using SprintTracker.Database.Models;
 using SprintTracker.DTO.Requests;
+using SprintTracker.Mapper;
 
 namespace SprintTracker.Controllers
 {
@@ -11,10 +14,12 @@ namespace SprintTracker.Controllers
     public class SprintUserController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly UserMapper _userMapper;
 
-        public SprintUserController(AppDbContext context)
+        public SprintUserController(AppDbContext context, UserMapper userMapper)
         {
             _context = context;
+            _userMapper = userMapper;
         }
 
         [HttpPost("Sprint/{id}/join")]
@@ -108,39 +113,36 @@ namespace SprintTracker.Controllers
             return Ok(members);
         }
 
-        [HttpPost("User")]
-        public IActionResult CreateUser([FromBody] CreateUserRequest request)
+        [HttpPost("Register")]
+        public IActionResult RegisterUser([FromBody] CreateUserRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Name))
+            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
             {
-                return BadRequest("User name is required");
+                return BadRequest("User name and password are required");
             }
 
-            var user = new User
-            {
-                Name = request.Name.Trim()
-            };
+            var user = _userMapper.MapToUser(request);
 
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            return CreatedAtAction(nameof(CreateUser), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(RegisterUser), new { id = user.Id }, user);
         }
 
         [HttpPost("login")]
         public IActionResult Login([FromBody] CreateUserRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Name))
+            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
             {
-                return BadRequest("User name is required");
+                return BadRequest("User name and password are required");
             }
 
             var normalized = request.Name.Trim();
             var user = _context.Users.FirstOrDefault(u => u.Name == normalized);
 
-            if (user == null)
+            if (user == null || !_userMapper.VerifyPassword(request.Password, user.PasswordHash))
             {
-                user = new User { Name = normalized };
+                user = _userMapper.MapToUser(request);
                 _context.Users.Add(user);
                 _context.SaveChanges();
             }

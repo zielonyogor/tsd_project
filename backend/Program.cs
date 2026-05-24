@@ -32,6 +32,7 @@ namespace SprintTracker
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddSingleton<UserStoryMapper>();
             builder.Services.AddSingleton<SprintMapper>();
+            builder.Services.AddSingleton<UserMapper>();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 

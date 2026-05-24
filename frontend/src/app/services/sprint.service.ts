@@ -11,7 +11,6 @@ export class SprintService {
     getStories(id: string) { return api.getUserStoriesBySprintFromBackend(id); }
     createSprint(sprint: Sprint, creatorUserId: number) { return api.createSprintFromBackend(sprint, creatorUserId); }
     updateSprint(sprint: Sprint) { return api.updateSprintFromBackend(sprint); }
-    createUser(name: string) { return api.loginUserFromBackend(name); }
     createUserStory(story: UserStory) {
         return api.createUserStoryFromBackend(story);
     }

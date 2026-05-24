@@ -7,6 +7,7 @@ using SprintTracker.Controllers;
 using SprintTracker.Database.Data;
 using SprintTracker.Database.Models;
 using SprintTracker.DTO.Requests;
+using SprintTracker.Mapper;
 
 namespace SprintTracker.Tests.Controllers
 {
@@ -16,11 +17,12 @@ namespace SprintTracker.Tests.Controllers
         public void CreateUser_ShouldReturnCreatedAndPersistUser()
         {
             using var context = GetDatabaseContext();
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
-            var result = controller.CreateUser(new CreateUserRequest
+            var result = controller.RegisterUser(new CreateUserRequest
             {
-                Name = "Developer"
+                Name = "Developer",
+                Password = "password123"
             });
 
             var createdResult = result.Should().BeOfType<CreatedAtActionResult>().Subject;
@@ -32,11 +34,27 @@ namespace SprintTracker.Tests.Controllers
         public void CreateUser_ShouldReturnBadRequest_WhenNameIsEmpty()
         {
             using var context = GetDatabaseContext();
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
-            var result = controller.CreateUser(new CreateUserRequest
+            var result = controller.RegisterUser(new CreateUserRequest
             {
-                Name = " "
+                Name = " ",
+                Password = "password123"
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
+        public void CreateUser_ShouldReturnBadRequest_WhenPasswordIsEmpty()
+        {
+            using var context = GetDatabaseContext();
+            var controller = new SprintUserController(context, new UserMapper());
+
+            var result = controller.RegisterUser(new CreateUserRequest
+            {
+                Name = "Developer",
+                Password = " "
             });
 
             result.Should().BeOfType<BadRequestObjectResult>();
@@ -47,11 +65,12 @@ namespace SprintTracker.Tests.Controllers
         {
             using var context = GetDatabaseContext();
             SeedUsers(context);
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.Login(new CreateUserRequest
             {
-                Name = "Alice"
+                Name = "Alice",
+                Password = "password123"
             });
 
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -64,11 +83,12 @@ namespace SprintTracker.Tests.Controllers
         public void Login_ShouldCreateAndReturnNewUser_WhenUserDoesNotExist()
         {
             using var context = GetDatabaseContext();
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.Login(new CreateUserRequest
             {
-                Name = "NewUser"
+                Name = "NewUser",
+                Password = "password123"
             });
 
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -81,11 +101,12 @@ namespace SprintTracker.Tests.Controllers
         public void Login_ShouldReturnBadRequest_WhenNameIsEmpty()
         {
             using var context = GetDatabaseContext();
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.Login(new CreateUserRequest
             {
-                Name = "  "
+                Name = "  ",
+                Password = "password123"
             });
 
             result.Should().BeOfType<BadRequestObjectResult>();
@@ -98,7 +119,7 @@ namespace SprintTracker.Tests.Controllers
             SeedSprints(context);
             SeedUsers(context);
 
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.JoinSprint(1, new JoinSprintRequest
             {
@@ -115,7 +136,7 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             SeedSprints(context);
 
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.JoinSprint(1, new JoinSprintRequest
             {
@@ -131,7 +152,7 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             SeedUsers(context);
 
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.JoinSprint(1, new JoinSprintRequest
             {
@@ -149,7 +170,7 @@ namespace SprintTracker.Tests.Controllers
             SeedUsers(context);
             SeedSprintMembers(context);
 
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.JoinSprint(1, new JoinSprintRequest
             {
@@ -165,10 +186,10 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             var sprint = new Sprint { Id = 1, Name = "Sprint 1", JoinCode = "ABC123" };
             context.Sprints.Add(sprint);
-            context.Users.Add(new User { Id = 1, Name = "Alice" });
+            context.Users.Add(new User { Id = 1, Name = "Alice", PasswordHash = "hashedpassword" });
             context.SaveChanges();
 
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.JoinSprintByCode(new JoinSprintByCodeRequest
             {
@@ -186,7 +207,7 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             SeedUsers(context);
 
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.JoinSprintByCode(new JoinSprintByCodeRequest
             {
@@ -205,7 +226,7 @@ namespace SprintTracker.Tests.Controllers
             context.Sprints.Add(sprint);
             context.SaveChanges();
 
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.JoinSprintByCode(new JoinSprintByCodeRequest
             {
@@ -222,11 +243,11 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             var sprint = new Sprint { Id = 1, Name = "Sprint 1", JoinCode = "ABC123" };
             context.Sprints.Add(sprint);
-            context.Users.Add(new User { Id = 1, Name = "Alice" });
+            context.Users.Add(new User { Id = 1, Name = "Alice", PasswordHash = "hashedpassword" });
             context.SprintMembers.Add(new SprintMember { Id = 1, SprintId = 1, UserId = 1 });
             context.SaveChanges();
 
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.JoinSprintByCode(new JoinSprintByCodeRequest
             {
@@ -245,7 +266,7 @@ namespace SprintTracker.Tests.Controllers
             SeedUsers(context);
             SeedSprintMembers(context);
 
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.GetSprintMembers(1);
 
@@ -258,7 +279,7 @@ namespace SprintTracker.Tests.Controllers
         public void GetSprintMembers_ShouldReturnNotFound_WhenSprintDoesNotExist()
         {
             using var context = GetDatabaseContext();
-            var controller = new SprintUserController(context);
+            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.GetSprintMembers(99);
 
@@ -284,8 +305,8 @@ namespace SprintTracker.Tests.Controllers
 
         private void SeedUsers(AppDbContext context)
         {
-            context.Users.Add(new User { Id = 1, Name = "Alice" });
-            context.Users.Add(new User { Id = 2, Name = "Bob" });
+            context.Users.Add(new User { Id = 1, Name = "Alice", PasswordHash = "hashedpassword" });
+            context.Users.Add(new User { Id = 2, Name = "Bob", PasswordHash = "hashedpassword" });
             context.SaveChanges();
         }
 
