@@ -8,7 +8,6 @@ import { Login } from './login';
 describe('Login', () => {
   let component: Login;
   let fixture: ComponentFixture<Login>;
-  let navigateSpy: any;
 
   const mockUserService = {
     loginUser: vi.fn(),
@@ -30,9 +29,6 @@ describe('Login', () => {
 
     fixture = TestBed.createComponent(Login);
     component = fixture.componentInstance;
-
-    const routerInstance = TestBed.inject(Router);
-    navigateSpy = vi.spyOn(routerInstance, 'navigate').mockResolvedValue(true);
 
     fixture.detectChanges();
     await fixture.whenStable();
