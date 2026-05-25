@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
@@ -15,9 +15,8 @@ export class Register {
   protected password = '';
   protected confirmPassword = '';
   protected isRegistering = false;
-  
+
   private readonly router = inject(Router);
-  private readonly cdr = inject(ChangeDetectorRef);
   private readonly service = inject(UserService);
 
   protected async register(): Promise<void> {

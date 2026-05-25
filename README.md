@@ -102,3 +102,10 @@ docker compose --profile test run --rm --build backend-tests
 
 If you want to pass extra `dotnet test` arguments, append them to the script command.
 
+## Frontend testing
+
+To run frontend tests, execute in the `frontend` directory:
+
+```bash
+ng test --watch=false
+```
