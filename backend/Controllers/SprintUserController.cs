@@ -114,7 +114,7 @@ namespace SprintTracker.Controllers
         }
 
         [HttpPost("Register")]
-        public IActionResult RegisterUser([FromBody] CreateUserRequest request)
+        public IActionResult RegisterUser([FromBody] RegisterUserRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
             {
@@ -130,7 +130,7 @@ namespace SprintTracker.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] CreateUserRequest request)
+        public IActionResult Login([FromBody] RegisterUserRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
             {

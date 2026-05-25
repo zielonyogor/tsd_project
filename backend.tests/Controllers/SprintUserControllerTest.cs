@@ -14,12 +14,12 @@ namespace SprintTracker.Tests.Controllers
     public class SprintUserControllerTests
     {
         [Fact]
-        public void CreateUser_ShouldReturnCreatedAndPersistUser()
+        public void RegisterUser_ShouldReturnCreatedAndPersistUser()
         {
             using var context = GetDatabaseContext();
             var controller = new SprintUserController(context, new UserMapper());
 
-            var result = controller.RegisterUser(new CreateUserRequest
+            var result = controller.RegisterUser(new RegisterUserRequest
             {
                 Name = "Developer",
                 Password = "password123"
@@ -31,12 +31,12 @@ namespace SprintTracker.Tests.Controllers
         }
 
         [Fact]
-        public void CreateUser_ShouldReturnBadRequest_WhenNameIsEmpty()
+        public void RegisterUser_ShouldReturnBadRequest_WhenNameIsEmpty()
         {
             using var context = GetDatabaseContext();
             var controller = new SprintUserController(context, new UserMapper());
 
-            var result = controller.RegisterUser(new CreateUserRequest
+            var result = controller.RegisterUser(new RegisterUserRequest
             {
                 Name = " ",
                 Password = "password123"
@@ -46,12 +46,12 @@ namespace SprintTracker.Tests.Controllers
         }
 
         [Fact]
-        public void CreateUser_ShouldReturnBadRequest_WhenPasswordIsEmpty()
+        public void RegisterUser_ShouldReturnBadRequest_WhenPasswordIsEmpty()
         {
             using var context = GetDatabaseContext();
             var controller = new SprintUserController(context, new UserMapper());
 
-            var result = controller.RegisterUser(new CreateUserRequest
+            var result = controller.RegisterUser(new RegisterUserRequest
             {
                 Name = "Developer",
                 Password = " "
@@ -61,22 +61,28 @@ namespace SprintTracker.Tests.Controllers
         }
 
         [Fact]
-        public void Login_ShouldReturnOkWithExistingUser_WhenUserExists()
+        public void RegisterAndLogin_ShouldPersistUserAndAllowSubsequentLogin()
         {
             using var context = GetDatabaseContext();
-            SeedUsers(context);
             var controller = new SprintUserController(context, new UserMapper());
 
-            var result = controller.Login(new CreateUserRequest
+            var credentials = new RegisterUserRequest
             {
-                Name = "Alice",
-                Password = "password123"
-            });
+                Name = "FlowDeveloper",
+                Password = "dynamicPassword123"
+            };
 
-            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var registerResult = controller.RegisterUser(credentials);
+
+            var createdResult = registerResult.Should().BeOfType<CreatedAtActionResult>().Subject;
+            context.Users.Should().Contain(u => u.Name == credentials.Name);
+            createdResult.RouteValues.Should().ContainKey("id");
+
+            var loginResult = controller.Login(credentials);
+
+            var okResult = loginResult.Should().BeOfType<OkObjectResult>().Subject;
             var user = okResult.Value.Should().BeAssignableTo<User>().Subject;
-            user.Name.Should().Be("Alice");
-            context.Users.Should().HaveCount(2);
+            user.Name.Should().Be(credentials.Name);
         }
 
         [Fact]
@@ -85,7 +91,7 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             var controller = new SprintUserController(context, new UserMapper());
 
-            var result = controller.Login(new CreateUserRequest
+            var result = controller.Login(new RegisterUserRequest
             {
                 Name = "NewUser",
                 Password = "password123"
@@ -103,7 +109,7 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             var controller = new SprintUserController(context, new UserMapper());
 
-            var result = controller.Login(new CreateUserRequest
+            var result = controller.Login(new RegisterUserRequest
             {
                 Name = "  ",
                 Password = "password123"
@@ -305,6 +311,7 @@ namespace SprintTracker.Tests.Controllers
 
         private void SeedUsers(AppDbContext context)
         {
+            context.Users.RemoveRange(context.Users); // Clear existing users to avoid conflicts
             context.Users.Add(new User { Id = 1, Name = "Alice", PasswordHash = "hashedpassword" });
             context.Users.Add(new User { Id = 2, Name = "Bob", PasswordHash = "hashedpassword" });
             context.SaveChanges();
@@ -312,6 +319,7 @@ namespace SprintTracker.Tests.Controllers
 
         private void SeedSprintMembers(AppDbContext context)
         {
+            context.SprintMembers.RemoveRange(context.SprintMembers); // Clear existing sprint members to avoid conflicts
             context.SprintMembers.Add(new SprintMember { Id = 1, SprintId = 1, UserId = 1 });
             context.SaveChanges();
         }

@@ -8,8 +8,6 @@ import { Register } from './register';
 describe('Register', () => {
   let component: Register;
   let fixture: ComponentFixture<Register>;
-  let navigateSpy: any;
-
   const mockUserService = {
     registerUser: vi.fn(),
   };
@@ -29,9 +27,6 @@ describe('Register', () => {
 
     fixture = TestBed.createComponent(Register);
     component = fixture.componentInstance;
-
-    const routerInstance = TestBed.inject(Router);
-    navigateSpy = vi.spyOn(routerInstance, 'navigate').mockResolvedValue(true);
 
     fixture.detectChanges();
     await fixture.whenStable();
@@ -76,6 +71,9 @@ describe('Register', () => {
       isRegistering: boolean;
       register: () => Promise<void>;
     };
+    
+    const routerInstance = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(routerInstance, 'navigate').mockResolvedValue(true);
 
     register.userName = 'Kasia';
     register.password = 'password';

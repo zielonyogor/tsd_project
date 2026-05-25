@@ -8,7 +8,6 @@ import { Login } from './login';
 describe('Login', () => {
   let component: Login;
   let fixture: ComponentFixture<Login>;
-  let navigateSpy: any;
 
   const mockUserService = {
     loginUser: vi.fn(),
@@ -31,9 +30,6 @@ describe('Login', () => {
     fixture = TestBed.createComponent(Login);
     component = fixture.componentInstance;
 
-    const routerInstance = TestBed.inject(Router);
-    navigateSpy = vi.spyOn(routerInstance, 'navigate').mockResolvedValue(true);
-
     fixture.detectChanges();
     await fixture.whenStable();
   });
@@ -49,6 +45,9 @@ describe('Login', () => {
   it('redirects to home when a user is already stored', async () => {
     clearCurrentUser();
     saveCurrentUser({ id: 2, name: 'Existing user' });
+
+    const routerInstance = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(routerInstance, 'navigate').mockResolvedValue(true);
 
     const localFixture = TestBed.createComponent(Login);
     localFixture.detectChanges();
@@ -84,6 +83,9 @@ describe('Login', () => {
       isLoggingIn: boolean;
       login: () => Promise<void>;
     };
+    
+    const routerInstance = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(routerInstance, 'navigate').mockResolvedValue(true);
 
     login.userName = 'Alicja';
     login.password = 'password';

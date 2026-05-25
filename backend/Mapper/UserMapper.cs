@@ -8,7 +8,7 @@ namespace SprintTracker.Mapper
 {
     public class UserMapper
     {
-        public User MapToUser(CreateUserRequest request)
+        public User MapToUser(RegisterUserRequest request)
         {
             return new User
             {
