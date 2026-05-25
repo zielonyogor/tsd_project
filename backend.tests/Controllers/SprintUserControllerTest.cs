@@ -7,10 +7,6 @@ using SprintTracker.Controllers;
 using SprintTracker.Database.Data;
 using SprintTracker.Database.Models;
 using SprintTracker.DTO.Requests;
-<<<<<<< HEAD
-using SprintTracker.DTO.Responses;
-=======
->>>>>>> edac38e (Add registration and password)
 using SprintTracker.Mapper;
 
 namespace SprintTracker.Tests.Controllers
@@ -22,13 +18,12 @@ namespace SprintTracker.Tests.Controllers
         {
             using var context = GetDatabaseContext();
             var controller = new SprintUserController(context, new UserMapper());
+            var controller = new SprintUserController(context, new UserMapper());
 
-<<<<<<< HEAD
             var result = controller.RegisterUser(new RegisterUserRequest
-=======
-            var result = controller.RegisterUser(new CreateUserRequest
->>>>>>> edac38e (Add registration and password)
             {
+                Name = "Developer",
+                Password = "password123"
                 Name = "Developer",
                 Password = "password123"
             });
@@ -43,33 +38,12 @@ namespace SprintTracker.Tests.Controllers
         {
             using var context = GetDatabaseContext();
             var controller = new SprintUserController(context, new UserMapper());
+            var controller = new SprintUserController(context, new UserMapper());
 
-<<<<<<< HEAD
             var result = controller.RegisterUser(new RegisterUserRequest
             {
                 Name = " ",
                 Password = "password123"
-=======
-            var result = controller.RegisterUser(new CreateUserRequest
-            {
-                Name = " ",
-                Password = "password123"
-            });
-
-            result.Should().BeOfType<BadRequestObjectResult>();
-        }
-
-        [Fact]
-        public void CreateUser_ShouldReturnBadRequest_WhenPasswordIsEmpty()
-        {
-            using var context = GetDatabaseContext();
-            var controller = new SprintUserController(context, new UserMapper());
-
-            var result = controller.RegisterUser(new CreateUserRequest
-            {
-                Name = "Developer",
-                Password = " "
->>>>>>> edac38e (Add registration and password)
             });
 
             result.Should().BeOfType<BadRequestObjectResult>();
@@ -79,24 +53,35 @@ namespace SprintTracker.Tests.Controllers
         public void RegisterUser_ShouldReturnBadRequest_WhenPasswordIsEmpty()
         {
             using var context = GetDatabaseContext();
-<<<<<<< HEAD
-=======
-            SeedUsers(context);
->>>>>>> edac38e (Add registration and password)
             var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.RegisterUser(new RegisterUserRequest
             {
-<<<<<<< HEAD
                 Name = "Developer",
                 Password = " "
-=======
-                Name = "Alice",
-                Password = "password123"
->>>>>>> edac38e (Add registration and password)
             });
 
             result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
+        public void Login_ShouldReturnOkWithExistingUser_WhenUserExists()
+        {
+            using var context = GetDatabaseContext();
+            var controller = new SprintUserController(context, new UserMapper());
+
+            var result = controller.Login(new CreateUserRequest
+            {
+                Name = "FlowDeveloper",
+                Password = "dynamicPassword123"
+            };
+
+            var registerResult = controller.RegisterUser(credentials);
+
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var user = okResult.Value.Should().BeAssignableTo<User>().Subject;
+            user.Name.Should().Be("Alice");
+            context.Users.Should().HaveCount(2);
         }
 
         [Fact]
@@ -105,17 +90,11 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             var controller = new SprintUserController(context, new UserMapper());
 
-            var credentials = new RegisterUserRequest
+            var result = controller.Login(new CreateUserRequest
             {
-<<<<<<< HEAD
-                Name = "FlowDeveloper",
-                Password = "dynamicPassword123"
-            };
-=======
                 Name = "NewUser",
                 Password = "password123"
             });
->>>>>>> edac38e (Add registration and password)
 
             var registerResult = controller.RegisterUser(credentials);
 
@@ -152,6 +131,7 @@ namespace SprintTracker.Tests.Controllers
             SeedSprints(context);
             SeedUsers(context);
 
+            var controller = new SprintUserController(context, new UserMapper());
             var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.JoinSprint(1, new JoinSprintRequest
@@ -338,10 +318,7 @@ namespace SprintTracker.Tests.Controllers
 
         private void SeedUsers(AppDbContext context)
         {
-<<<<<<< HEAD
             context.Users.RemoveRange(context.Users); // Clear existing users to avoid conflicts
-=======
->>>>>>> edac38e (Add registration and password)
             context.Users.Add(new User { Id = 1, Name = "Alice", PasswordHash = "hashedpassword" });
             context.Users.Add(new User { Id = 2, Name = "Bob", PasswordHash = "hashedpassword" });
             context.SaveChanges();
