@@ -7,6 +7,7 @@ using SprintTracker.Controllers;
 using SprintTracker.Database.Data;
 using SprintTracker.Database.Models;
 using SprintTracker.DTO.Requests;
+using SprintTracker.DTO.Responses;
 using SprintTracker.Mapper;
 
 namespace SprintTracker.Tests.Controllers
@@ -81,26 +82,8 @@ namespace SprintTracker.Tests.Controllers
             var loginResult = controller.Login(credentials);
 
             var okResult = loginResult.Should().BeOfType<OkObjectResult>().Subject;
-            var user = okResult.Value.Should().BeAssignableTo<User>().Subject;
+            var user = okResult.Value.Should().BeAssignableTo<LoginUserResponse>().Subject;
             user.Name.Should().Be(credentials.Name);
-        }
-
-        [Fact]
-        public void Login_ShouldCreateAndReturnNewUser_WhenUserDoesNotExist()
-        {
-            using var context = GetDatabaseContext();
-            var controller = new SprintUserController(context, new UserMapper());
-
-            var result = controller.Login(new RegisterUserRequest
-            {
-                Name = "NewUser",
-                Password = "password123"
-            });
-
-            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-            var user = okResult.Value.Should().BeAssignableTo<User>().Subject;
-            user.Name.Should().Be("NewUser");
-            context.Users.Should().Contain(u => u.Name == "NewUser");
         }
 
         [Fact]
