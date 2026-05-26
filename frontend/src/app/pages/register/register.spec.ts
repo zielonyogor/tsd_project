@@ -50,7 +50,7 @@ describe('Register', () => {
       register: () => Promise<void>;
     };
 
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => undefined);
 
     register.userName = 'Kasia';
     register.password = 'password1';
@@ -62,7 +62,7 @@ describe('Register', () => {
   });
 
   it('registers user and navigates to login on success', async () => {
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => undefined);
     const register = component as unknown as {
       userName: string;
       password: string;
