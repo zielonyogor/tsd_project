@@ -29,7 +29,7 @@ export class Register {
     try {
       await this.service.registerUser(this.userName, this.password);
       alert('Registration successful!');
-      this.router.navigate(['/login']);
+      await this.router.navigate(['/login']);
     } catch {
       alert('Registration failed!');
     } finally {
