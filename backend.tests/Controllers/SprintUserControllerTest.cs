@@ -7,6 +7,7 @@ using SprintTracker.Controllers;
 using SprintTracker.Database.Data;
 using SprintTracker.Database.Models;
 using SprintTracker.DTO.Requests;
+using SprintTracker.DTO.Responses;
 using SprintTracker.Mapper;
 
 namespace SprintTracker.Tests.Controllers
