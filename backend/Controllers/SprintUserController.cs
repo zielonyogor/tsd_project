@@ -126,7 +126,8 @@ namespace SprintTracker.Controllers
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            return CreatedAtAction(nameof(RegisterUser), new { id = user.Id }, user);
+            var response = _userMapper.MapToRegisterUserResponse(user);
+            return CreatedAtAction(nameof(RegisterUser), new { id = user.Id }, response);
         }
 
         [HttpPost("login")]
@@ -147,7 +148,8 @@ namespace SprintTracker.Controllers
                 _context.SaveChanges();
             }
 
-            return Ok(user);
+            var response = _userMapper.MapToLoginUserResponse(user);
+            return Ok(response);
         }
     }
 }
