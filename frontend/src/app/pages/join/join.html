@@ -1,9 +1,16 @@
 <div class="join-page">
-  <h1 class="title">Join Sprint</h1>
-  <p>
-    Signed in as <strong>{{ currentUser?.name }}</strong>.
-    Enter the sprint code below.
-  </p>
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">◆</span>
+    <span class="brand-name">Sprintly</span>
+  </div>
+
+  <header class="join-header">
+    <h1 class="title">Join a sprint</h1>
+    <p>
+      Signed in as <strong>{{ currentUser?.name }}</strong>.
+      Enter the sprint code below.
+    </p>
+  </header>
 
   <form class="join-card" (ngSubmit)="joinSprint()">
     <label class="field-label" for="join-code">Sprint join code</label>
@@ -13,17 +20,18 @@
       class="field-input"
       [(ngModel)]="joinCode"
       name="joinCode"
+      placeholder="e.g. ABC-123"
     />
 
     @if (joinError) {
-      <p class="error-msg">{{ joinError }}</p>
+      <p class="error-msg" role="alert">{{ joinError }}</p>
     }
 
     <div class="actions-row">
+      <button class="card-action-btn muted" type="button" (click)="goBack()">Back</button>
       <button class="card-action-btn" type="submit" [disabled]="isJoining">
         {{ isJoining ? 'Joining…' : 'Join sprint' }}
       </button>
-      <button class="card-action-btn muted" type="button" (click)="goBack()">Back</button>
     </div>
   </form>
 </div>

@@ -1,5 +1,6 @@
 main {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  animation: fade-in var(--t-slow) var(--ease-out);
 }

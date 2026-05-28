@@ -1,10 +1,19 @@
 <div class="login-page">
-  <header class="login-header">
-    <h1 class="title">Sign in</h1>
-    <p>Use your username to continue.</p>
-  </header>
+  <div class="auth-side">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">◆</span>
+      <span class="brand-name">Sprintly</span>
+    </div>
+    <h2 class="auth-tagline">Plan, run, and ship sprints — together.</h2>
+    <p class="auth-blurb">Keep your team aligned with a calm, focused board.</p>
+  </div>
 
   <form class="login-card" (ngSubmit)="login()">
+    <header class="auth-card-head">
+      <h1 class="title">Sign in</h1>
+      <p class="auth-sub">Use your username to continue.</p>
+    </header>
+
     <label class="field-label" for="login-name">Username</label>
     <input
       id="login-name"
@@ -15,6 +24,7 @@
       autocomplete="username"
       autocapitalize="none"
       spellcheck="false"
+      placeholder="your.name"
       required
     />
 
@@ -28,11 +38,12 @@
       autocomplete="current-password"
       autocapitalize="none"
       spellcheck="false"
+      placeholder="••••••••"
       required
     />
 
     @if (loginError) {
-      <p class="error-msg">{{ loginError }}</p>
+      <p class="error-msg" role="alert">{{ loginError }}</p>
     }
 
     <div class="actions-row">
@@ -40,9 +51,10 @@
         {{ isLoggingIn ? 'Signing in…' : 'Sign in' }}
       </button>
     </div>
+
+    <p class="signup-link">
+      Don't have an account?
+      <a routerLink="/register">Sign up</a>
+    </p>
   </form>
-  <p class="signup-link">
-    Don't have an account?
-    <a routerLink="/register">Sign up</a>
-  </p>
 </div>

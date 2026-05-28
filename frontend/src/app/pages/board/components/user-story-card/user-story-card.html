@@ -1,4 +1,15 @@
-<article class="user-story-card" role="button" tabindex="0" (click)="onOpenStory()" (keyup.enter)="onOpenStory()" (keyup.space)="onOpenStory()">
-  <h3>{{ story.title }}</h3>
-  <p>{{ story.description }}</p>
+<article
+  class="user-story-card"
+  [attr.data-status]="story.status"
+  role="button"
+  tabindex="0"
+  (click)="onOpenStory()"
+  (keyup.enter)="onOpenStory()"
+  (keyup.space)="onOpenStory()"
+>
+  <h3 class="story-title">{{ story.title }}</h3>
+  <p class="story-desc">{{ story.description }}</p>
+  <footer class="story-foot">
+    <span class="status-tag">{{ story.status }}</span>
+  </footer>
 </article>

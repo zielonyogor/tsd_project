@@ -32,17 +32,17 @@ export class ProgressBar {
   private getColorForStatus(status: string) {
     switch(status) {
       case "To Do":
-        return "#757575";
+        return "#8c8189";
       case "Blocked":
-        return "#f44336";
+        return "#b85268";
       case "In Progress":
-        return "#2196f3";
+        return "#6b7cc0";
       case "Code Review":
-        return "#ff9800";
+        return "#c68f4f";
       case "Done":
-        return "#4caf50";
+        return "#5f9279";
       default:
-        return "#202020";
+        return "#51344d";
     }
   }
 

@@ -1,34 +1,59 @@
 @if (isProgressOpen) {
-    <div class="modal-overlay" (click)="toggleProgressDisplay()" role="button" tabindex="0"
-        (keydown.enter)="toggleProgressDisplay()" (keydown.space)="toggleProgressDisplay()">
-        <div class="modal-content" (click)="$event.stopPropagation()" role="button" tabindex="0"
-            (keydown.enter)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
-            <h3>Sprint Progress by Status</h3>
-            <div class="progress-bar">
-                @for (item of getStatusProgress(); track item.status) {
-                    <div class="progress-segment"
-                        [style.width.%]="item.width"
-                        [style.background]="item.color">
-                    </div>
-                }
-            </div>
-            @for (item of getStatusProgress(); track item.status) {
-                <div class="status-row">
-                <span class="color-dot" [style.background-color]="item.color"></span>
-                <span>{{ item.status }}</span>
-                <span class="count">{{ item.count }}</span>
-                </div>
-            }
-            <button (click)="toggleProgressDisplay()">Close</button>
-        </div>
+  <div
+    class="modal-overlay"
+    (click)="toggleProgressDisplay()"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="toggleProgressDisplay()"
+    (keydown.space)="toggleProgressDisplay()"
+  >
+    <div
+      class="modal-content"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+    >
+      <header class="modal-content-header">
+        <h3>Sprint progress by status</h3>
+        <button class="icon-close" type="button" aria-label="Close" (click)="toggleProgressDisplay()">×</button>
+      </header>
+
+      <div class="stacked-bar" aria-hidden="true">
+        @for (item of getStatusProgress(); track item.status) {
+          <div
+            class="stacked-segment"
+            [style.width.%]="item.width"
+            [style.background]="item.color"
+            [title]="item.status + ': ' + item.count"
+          ></div>
+        }
+      </div>
+
+      <ul class="status-list">
+        @for (item of getStatusProgress(); track item.status) {
+          <li class="status-row">
+            <span class="color-dot" [style.background-color]="item.color"></span>
+            <span class="status-name">{{ item.status }}</span>
+            <span class="count">{{ item.count }}</span>
+          </li>
+        }
+      </ul>
     </div>
+  </div>
 }
 
-<div class="progress-background"></div>
-<div class="progress-container">
-    <progress [value]="getProgressPercentage()" [max]="100"
-        (click)="toggleProgressDisplay()" role="button" tabindex="0"
-        (keydown.enter)="toggleProgressDisplay()" (keydown.space)="toggleProgressDisplay()">
-    </progress>
-    <p>{{ getProgressPercentage().toFixed(0) }}%</p>
-</div>
+<button
+  type="button"
+  class="progress-strip"
+  (click)="toggleProgressDisplay()"
+  (keydown.enter)="toggleProgressDisplay()"
+  (keydown.space)="toggleProgressDisplay()"
+  [attr.aria-label]="'Sprint progress ' + getProgressPercentage().toFixed(0) + '%, click for details'"
+>
+  <span class="strip-label">Progress</span>
+  <span class="strip-track">
+    <span class="strip-fill" [style.width.%]="getProgressPercentage()"></span>
+  </span>
+  <span class="strip-value">{{ getProgressPercentage().toFixed(0) }}%</span>
+</button>

@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ActivatedRoute, Router, type ParamMap } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, type ParamMap } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import type { Sprint } from '../../../types/sprint';
 import { USER_STORY_STATUSES, UserStoryStatus, type UserStory } from '../../../types/userStory';
@@ -14,7 +14,7 @@ import { getCurrentUser } from '../../data/user-storage';
   selector: 'app-board',
   templateUrl: './board.html',
   styleUrl: './board.scss',
-  imports: [DatePipe, FormsModule, UserStoryCard, ProgressBar],
+  imports: [DatePipe, FormsModule, RouterLink, UserStoryCard, ProgressBar],
 })
 export class Board implements OnInit {
   protected currentUser: User | null = null;
@@ -73,6 +73,17 @@ export class Board implements OnInit {
 
   public getUserStoriesForColumn(status: UserStoryStatus): UserStory[] {
     return this.userStories.filter(story => story.status === status);
+  }
+
+  protected columnColor(status: UserStoryStatus): string {
+    switch (status) {
+      case 'To Do': return '#8c8189';
+      case 'Blocked': return '#b85268';
+      case 'In Progress': return '#6b7cc0';
+      case 'Code Review': return '#c68f4f';
+      case 'Done': return '#5f9279';
+      default: return '#8c8189';
+    }
   }
 
   protected onOpenStory(story: UserStory): void {

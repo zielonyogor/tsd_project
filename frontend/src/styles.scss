@@ -1,13 +1,188 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles + design tokens */
+
+:root {
+  /* Brand — plum / violet around #51344D */
+  --color-primary: #51344d;
+  --color-primary-hover: #6e4868;
+  --color-primary-active: #3d2538;
+  --color-primary-soft: #f4e8f0;
+  --color-primary-tint: #ece0e7;
+  --color-primary-border: #c8a4c0;
+  --color-primary-contrast: #ffffff;
+
+  --color-accent: #c68f4f;
+  --color-accent-soft: #f7ecd9;
+
+  /* Surfaces & neutrals (warm, plum-tinted) */
+  --color-bg: #faf6f8;
+  --color-bg-elevated: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f3eaef;
+  --color-surface-sunken: #f0e6ec;
+
+  --color-text: #1f1a1e;
+  --color-text-muted: #6b5e66;
+  --color-text-subtle: #94858d;
+  --color-text-on-primary: #ffffff;
+
+  --color-border: #e6dae1;
+  --color-border-strong: #cdbcc6;
+  --color-focus-ring: rgba(81, 52, 77, 0.35);
+
+  /* Status — pulled toward the plum palette so they feel like part of the same family */
+  --status-todo: #8c8189;
+  --status-blocked: #b85268;
+  --status-in-progress: #6b7cc0;
+  --status-review: #c68f4f;
+  --status-done: #5f9279;
+
+  --status-todo-soft: #efeaed;
+  --status-blocked-soft: #f6e6ea;
+  --status-in-progress-soft: #e7ebf6;
+  --status-review-soft: #f6ebdb;
+  --status-done-soft: #e6efea;
+
+  /* Feedback */
+  --color-danger: #b8324a;
+  --color-danger-soft: #f8e1e5;
+
+  /* Shadows (plum-tinted) */
+  --shadow-xs: 0 1px 2px rgba(60, 30, 55, 0.06);
+  --shadow-sm: 0 2px 6px rgba(60, 30, 55, 0.08), 0 1px 2px rgba(60, 30, 55, 0.04);
+  --shadow-md: 0 6px 18px rgba(60, 30, 55, 0.10), 0 2px 6px rgba(60, 30, 55, 0.05);
+  --shadow-lg: 0 20px 48px rgba(60, 30, 55, 0.22), 0 6px 16px rgba(60, 30, 55, 0.08);
+  --shadow-focus: 0 0 0 4px var(--color-focus-ring);
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-pill: 999px;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast: 120ms var(--ease-out);
+  --t-base: 200ms var(--ease-out);
+  --t-slow: 320ms var(--ease-out);
+
+  /* Layout */
+  --content-max: 1240px;
+  --topbar-height: 64px;
+}
+
 html,
 body {
-    height: 100%;
-    margin: 0;
+  height: 100%;
+  margin: 0;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    color: #090D1F;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: var(--color-text);
+  background: var(--color-bg);
+  background-image:
+    radial-gradient(900px 600px at 5% -10%, rgba(140, 92, 130, 0.10), transparent 60%),
+    radial-gradient(800px 500px at 105% 10%, rgba(198, 143, 79, 0.07), transparent 60%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  border-radius: 2px;
+
+  &:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+button {
+  font: inherit;
+}
+
+::selection {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-active);
+}
+
+/* Pretty scrollbars in the plum tone */
+*::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  background-clip: content-box;
+
+  &:hover {
+    background: var(--color-primary-border);
+    background-clip: content-box;
+  }
+}
+
+/* Shared animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
