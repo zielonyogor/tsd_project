@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core';
+import { inject, Injectable, NgZone } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Observable, Subject } from 'rxjs';
 import {
@@ -48,7 +48,7 @@ export class RealtimeSprintService {
   private readonly userStoryUpdated$ = new Subject<UserStory>();
   private readonly sprintUpdated$ = new Subject<Sprint>();
 
-  constructor(private readonly zone: NgZone) {}
+  private readonly zone = inject(NgZone);
 
   public get onUserStoryCreated(): Observable<UserStory> {
     return this.userStoryCreated$.asObservable();
