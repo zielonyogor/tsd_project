@@ -1,11 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { convertToParamMap } from '@angular/router';
+import { Subject } from 'rxjs';
 
 import { FAKE_SPRINT_BOARDS, FAKE_SPRINTS } from '../../data/fake-sprint-boards';
 import { clearCurrentUser, saveCurrentUser } from '../../data/user-storage';
 
 import { SprintService } from '../../services/sprint.service';
+import { RealtimeSprintService } from '../../services/realtime-sprint.service';
 import { Board } from './board';
 
 
@@ -23,6 +25,14 @@ describe('Board', () => {
     getStories: vi.fn(),
     createUserStory: vi.fn(),
     updateUserStory: vi.fn()
+  };
+
+  const mockRealtimeSprintService = {
+    onUserStoryCreated: new Subject(),
+    onUserStoryUpdated: new Subject(),
+    onSprintUpdated: new Subject(),
+    joinSprint: vi.fn().mockResolvedValue(undefined),
+    leaveSprint: vi.fn().mockResolvedValue(undefined),
   };
 
   const activatedRoute = {
@@ -67,6 +77,7 @@ describe('Board', () => {
       imports: [Board],
       providers: [
         { provide: SprintService, useValue: mockSprintService },
+        { provide: RealtimeSprintService, useValue: mockRealtimeSprintService },
         {
           provide: ActivatedRoute,
           useValue: activatedRoute,

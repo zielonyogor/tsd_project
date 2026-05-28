@@ -1,10 +1,13 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using SprintTracker.Controllers;
 using SprintTracker.Database.Data;
 using SprintTracker.Database.Models;
 using SprintTracker.DTO.Requests;
+using SprintTracker.Hubs;
 using SprintTracker.Mapper;
 
 namespace SprintTracker.Tests.Controllers
@@ -17,7 +20,7 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             SeedSprintsWithMembers(context);
             var mapper = new SprintMapper();
-            var controller = new SprintController(context, mapper);
+            var controller = new SprintController(context, mapper, CreateHubContext());
 
             var result = controller.GetSprintsForUser(1);
 
@@ -33,7 +36,7 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             SeedSprintsWithMembers(context);
             var mapper = new SprintMapper();
-            var controller = new SprintController(context, mapper);
+            var controller = new SprintController(context, mapper, CreateHubContext());
 
             var result = controller.GetSprintForUser(1, 1);
 
@@ -49,7 +52,7 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             SeedSprintsWithMembers(context);
             var mapper = new SprintMapper();
-            var controller = new SprintController(context, mapper);
+            var controller = new SprintController(context, mapper, CreateHubContext());
 
             var result = controller.GetSprintForUser(1, 2);
 
@@ -62,7 +65,7 @@ namespace SprintTracker.Tests.Controllers
             using var context = GetDatabaseContext();
             SeedUsers(context);
             var mapper = new SprintMapper();
-            var controller = new SprintController(context, mapper);
+            var controller = new SprintController(context, mapper, CreateHubContext());
             var request = new CreateSprintRequest
             {
                 Name = "New Sprint",
@@ -85,7 +88,7 @@ namespace SprintTracker.Tests.Controllers
         {
             using var context = GetDatabaseContext();
             var mapper = new SprintMapper();
-            var controller = new SprintController(context, mapper);
+            var controller = new SprintController(context, mapper, CreateHubContext());
             var request = new CreateSprintRequest
             {
                 Name = "New Sprint",
@@ -100,12 +103,12 @@ namespace SprintTracker.Tests.Controllers
         }
 
         [Fact]
-        public void UpdateSprint_ShouldModifyExistingSprint()
+        public async Task UpdateSprint_ShouldModifyExistingSprint()
         {
             using var context = GetDatabaseContext();
             SeedSprints(context);
             var mapper = new SprintMapper();
-            var controller = new SprintController(context, mapper);
+            var controller = new SprintController(context, mapper, CreateHubContext());
             var request = new CreateSprintRequest
             {
                 Name = "Updated Sprint",
@@ -114,7 +117,7 @@ namespace SprintTracker.Tests.Controllers
                 CreatorUserId = 1
             };
 
-            var result = controller.UpdateSprint(1, request);
+            var result = await controller.UpdateSprint(1, request);
 
             result.Should().BeOfType<OkObjectResult>();
             context.Sprints.Find(1)!.Name.Should().Be("Updated Sprint");
@@ -151,6 +154,22 @@ namespace SprintTracker.Tests.Controllers
             context.Sprints.Add(new Sprint { Id = 1, Name = "Sprint 1" });
             context.SprintMembers.Add(new SprintMember { Id = 1, SprintId = 1, UserId = 1 });
             context.SaveChanges();
+        }
+
+        private static IHubContext<SprintHub> CreateHubContext()
+        {
+            var clientProxy = new Mock<IClientProxy>();
+            clientProxy
+                .Setup(p => p.SendCoreAsync(It.IsAny<string>(), It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var clients = new Mock<IHubClients>();
+            clients.Setup(c => c.Group(It.IsAny<string>())).Returns(clientProxy.Object);
+
+            var hubContext = new Mock<IHubContext<SprintHub>>();
+            hubContext.Setup(h => h.Clients).Returns(clients.Object);
+
+            return hubContext.Object;
         }
     }
 }
