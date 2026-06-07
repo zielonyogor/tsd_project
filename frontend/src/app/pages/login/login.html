@@ -18,6 +18,19 @@
       required
     />
 
+    <label class="field-label" for="login-password">Password</label>
+    <input
+      id="login-password"
+      type="password"
+      class="field-input"
+      [(ngModel)]="password"
+      name="password"
+      autocomplete="current-password"
+      autocapitalize="none"
+      spellcheck="false"
+      required
+    />
+
     @if (loginError) {
       <p class="error-msg">{{ loginError }}</p>
     }
@@ -28,4 +41,8 @@
       </button>
     </div>
   </form>
+  <p class="signup-link">
+    Don't have an account?
+    <a routerLink="/register">Sign up</a>
+  </p>
 </div>

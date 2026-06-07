@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using SprintTracker.Controllers;
 using SprintTracker.Database.Data;
 using SprintTracker.Database.Models;
@@ -139,15 +138,15 @@ namespace SprintTracker.Tests.Controllers
 
         private void SeedUsers(AppDbContext context)
         {
-            context.Users.Add(new User { Id = 1, Name = "Alice" });
+            context.Users.Add(new User { Id = 1, Name = "Alice", PasswordHash = "hashedpassword" });
             context.SaveChanges();
         }
 
         private void SeedSprintsWithMembers(AppDbContext context)
         {
             context.Users.AddRange(
-                new User { Id = 1, Name = "Alice" },
-                new User { Id = 2, Name = "Bob" }
+                new User { Id = 1, Name = "Alice", PasswordHash = "hashedpassword" },
+                new User { Id = 2, Name = "Bob", PasswordHash = "hashedpassword" }
             );
             context.Sprints.Add(new Sprint { Id = 1, Name = "Sprint 1" });
             context.SprintMembers.Add(new SprintMember { Id = 1, SprintId = 1, UserId = 1 });

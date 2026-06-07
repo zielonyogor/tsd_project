@@ -1,24 +1,25 @@
 import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { SprintService } from '../../services/sprint.service';
+import { Router, RouterLink } from '@angular/router';
 import { getCurrentUser, saveCurrentUser } from '../../data/user-storage';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.html',
   styleUrl: './login.scss',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
 })
 export class Login implements OnInit {
   protected userName = '';
+  protected password = '';
   protected loginError = '';
   protected isLoggingIn = false;
 
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly service = inject(SprintService);
+  private readonly service = inject(UserService);
 
   ngOnInit(): void {
     const existingUser = getCurrentUser();
@@ -38,7 +39,7 @@ export class Login implements OnInit {
     this.isLoggingIn = true;
 
     try {
-      const user = await this.service.createUser(name);
+      const user = await this.service.loginUser(name, this.password);
       saveCurrentUser(user);
       void this.router.navigate(['/']);
     } catch {

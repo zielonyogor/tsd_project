@@ -1,0 +1,57 @@
+<div class="register-page">
+  <header class="register-header">
+    <h1 class="title">Sign up</h1>
+    <p>Create a new account to get started.</p>
+  </header>
+
+  <form class="register-card" (ngSubmit)="register()">
+    <label class="field-label" for="register-name">Username</label>
+    <input
+      id="register-name"
+      type="text"
+      class="field-input"
+      [(ngModel)]="userName"
+      name="userName"
+      autocomplete="username"
+      autocapitalize="none"
+      spellcheck="false"
+      required
+    />
+
+    <label class="field-label" for="register-password">Password</label>
+    <input
+      id="register-password"
+      type="password"
+      class="field-input"
+      [(ngModel)]="password"
+      name="password"
+      autocomplete="new-password"
+      autocapitalize="none"
+      spellcheck="false"
+      required
+    />
+
+    <label class="field-label" for="register-confirm-password">Confirm Password</label>
+    <input
+      id="register-confirm-password"
+      type="password"
+      class="field-input"
+      [(ngModel)]="confirmPassword"
+      name="confirmPassword"
+      autocomplete="new-password"
+      autocapitalize="none"
+      spellcheck="false"
+      required
+    />
+
+    <div class="actions-row">
+      <button class="card-action-btn" type="submit" [disabled]="isRegistering">
+        {{ isRegistering ? 'Signing up…' : 'Sign up' }}
+      </button>
+    </div>
+  </form>
+  <p class="signin-link">
+    Already have an account?
+    <a routerLink="/login">Sign in</a>
+  </p>
+</div>

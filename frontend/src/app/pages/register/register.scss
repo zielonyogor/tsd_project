@@ -4,14 +4,14 @@
   padding: 36px 24px;
 }
 
-.login-page {
+.register-page {
   width: min(100%, 460px);
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.login-header {
+.register-header {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -22,7 +22,7 @@
   }
 }
 
-.login-card {
+.register-card {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -74,7 +74,7 @@
   margin: 0;
 }
 
-.signup-link {
+.signin-link {
   margin-top: 12px;
   font-size: 0.9rem;
 

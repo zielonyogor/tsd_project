@@ -160,15 +160,29 @@ export interface UserApiResponse {
   name: string;
 }
 
-export async function loginUserFromBackend(name: string): Promise<UserApiResponse> {
+export async function loginUserFromBackend(name: string, password: string): Promise<UserApiResponse> {
   const response = await fetch(`${backendUrl}/SprintUser/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, password }),
   });
 
   if (!response.ok) {
     throw new Error(`Failed to log in: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json() as Promise<UserApiResponse>;
+}
+
+export async function registerUserFromBackend(name: string, password: string): Promise<UserApiResponse> {
+  const response = await fetch(`${backendUrl}/SprintUser/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, password }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to register: ${response.status} ${response.statusText}`);
   }
 
   return response.json() as Promise<UserApiResponse>;
