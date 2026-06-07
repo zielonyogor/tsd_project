@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angula
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, type ParamMap } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-// @ts-expect-error: missing rxjs types
 import { Subscription } from 'rxjs';
 import type { Sprint, SprintStatus } from '../../../types/sprint';
 import { USER_STORY_STATUSES, UserStoryStatus, type UserStory } from '../../../types/userStory';

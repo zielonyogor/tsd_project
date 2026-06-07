@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { convertToParamMap } from '@angular/router';
-// @ts-expect-error: missing rxjs types
 import { Subject } from 'rxjs';
 
 import { FAKE_SPRINT_BOARDS, FAKE_SPRINTS } from '../../data/fake-sprint-boards';

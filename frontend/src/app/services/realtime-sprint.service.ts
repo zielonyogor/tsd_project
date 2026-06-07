@@ -1,6 +1,5 @@
 import { inject, Injectable, NgZone } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
-// @ts-expect-error: missing rxjs types
 import { Observable, Subject } from 'rxjs';
 import {
   BACKEND_STATUS_ALIASES,
