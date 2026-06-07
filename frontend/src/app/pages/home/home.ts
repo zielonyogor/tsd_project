@@ -2,7 +2,7 @@ import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import type { Sprint } from '../../../types/sprint';
+import type { Sprint, SprintStatus } from '../../../types/sprint';
 import { SprintService } from '../../services/sprint.service';
 import type { User } from '../../../types/user';
 import { getCurrentUser, clearCurrentUser } from '../../data/user-storage';
@@ -40,6 +40,18 @@ export class Home implements OnInit {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly service = inject(SprintService);
+
+  protected get activeSprints(): Sprint[] {
+    return this.sprints.filter(s => s.status !== 'Done');
+  }
+
+  protected get completedSprints(): Sprint[] {
+    return this.sprints.filter(s => s.status === 'Done');
+  }
+
+  protected sprintStatusLabel(status: SprintStatus): string {
+    return status === 'InProgress' ? 'In progress' : status;
+  }
 
   ngOnInit(): void {
     this.currentUser = getCurrentUser();
@@ -145,6 +157,7 @@ export class Home implements OnInit {
       goal: title,
       startDate,
       endDate,
+      status: this.getStatusFromDates(startDate, endDate),
     };
 
     void (async () => {
@@ -249,6 +262,19 @@ export class Home implements OnInit {
     }
 
     return String(maxId + 1);
+  }
+
+  private getStatusFromDates(startDate: Date, endDate: Date): SprintStatus {
+    const now = new Date();
+    if (endDate < now) {
+      return 'Done';
+    }
+
+    if (startDate <= now) {
+      return 'InProgress';
+    }
+
+    return 'Upcoming';
   }
 
   private async loadSprints(): Promise<void> {

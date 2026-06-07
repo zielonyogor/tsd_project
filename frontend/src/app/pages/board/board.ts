@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, type ParamMap } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import type { Sprint } from '../../../types/sprint';
+import type { Sprint, SprintStatus } from '../../../types/sprint';
 import { USER_STORY_STATUSES, UserStoryStatus, type UserStory } from '../../../types/userStory';
 import { UserStoryCard } from './components/user-story-card/user-story-card';
 import { ProgressBar } from './components/progress-bar/progress-bar';
@@ -37,6 +37,8 @@ export class Board implements OnInit, OnDestroy {
   protected editStoryError = '';
   protected isLoading = false;
   protected loadError = '';
+  protected isFinishingSprint = false;
+  protected finishSprintError = '';
 
   public sprint: Sprint | null = null;
   protected userStories: UserStory[] = [];
@@ -124,15 +126,45 @@ export class Board implements OnInit, OnDestroy {
     return `${globalThis.location.origin}/join/${this.sprint.joinCode}`;
   }
 
+  protected sprintStatusLabel(status: SprintStatus): string {
+    return status === 'InProgress' ? 'In progress' : status;
+  }
+
+  protected async finishSprint(): Promise<void> {
+    if (!this.sprint || this.sprint.status === 'Done' || this.isFinishingSprint) {
+      return;
+    }
+
+    this.finishSprintError = '';
+    this.isFinishingSprint = true;
+
+    try {
+      this.sprint = await this.service.finishSprint(this.sprint.id);
+    } catch {
+      this.finishSprintError = 'Failed to finish sprint. Please try again.';
+    } finally {
+      this.isFinishingSprint = false;
+      this.cdr.markForCheck();
+    }
+  }
+
   public getUserStoriesForColumn(status: UserStoryStatus): UserStory[] {
     return this.userStories.filter(story => story.status === status);
   }
 
   protected onOpenStory(story: UserStory): void {
+    if (this.sprint?.status === 'Done') {
+      return;
+    }
+
     this.startEditingStory(story);
   }
 
   protected onAddStory(): void {
+    if (this.sprint?.status === 'Done') {
+      return;
+    }
+
     this.isCreatingStory = true;
     this.createStoryError = '';
     this.newStoryForm.title = '';
@@ -190,6 +222,10 @@ export class Board implements OnInit, OnDestroy {
   }
 
   protected saveStory(): void {
+    if (this.sprint?.status === 'Done') {
+      return;
+    }
+
     if (!this.editingStoryId) {
       return;
     }

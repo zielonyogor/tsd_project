@@ -13,6 +13,7 @@ export const FAKE_SPRINT_BOARDS: Record<string, SprintBoardData> = {
       goal: 'Make MVP',
       startDate: new Date(2026, 1, 1),
       endDate: new Date(2026, 1, 22),
+      status: 'Done',
     },
     userStories: [
       {
@@ -44,6 +45,7 @@ export const FAKE_SPRINT_BOARDS: Record<string, SprintBoardData> = {
       goal: 'Improve UI',
       startDate: new Date(2026, 1, 23),
       endDate: new Date(2026, 2, 5),
+      status: 'Done',
     },
     userStories: [
       {

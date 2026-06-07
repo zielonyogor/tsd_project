@@ -10,7 +10,7 @@ import {
   type UserStoryApiResponse,
   type UserStoryStatus,
 } from '../../types/userStory';
-import type { Sprint, SprintApiResponse } from '../../types/sprint';
+import type { Sprint, SprintApiResponse, SprintStatus } from '../../types/sprint';
 
 const backendUrl = (globalThis.location?.origin?.replace(':3000', ':8080') ?? 'http://localhost:8080').replace(/\/$/, '');
 
@@ -31,13 +31,38 @@ function toUserStory(dto: UserStoryApiResponse): UserStory {
 }
 
 function toSprint(dto: SprintApiResponse): Sprint {
+  const now = new Date();
+  const startDate = new Date(dto.startDate);
+  const endDate = new Date(dto.endDate);
+  const resolvedStatus: SprintStatus = normalizeSprintStatus(dto.status)
+    ?? (endDate < now ? 'Done' : startDate <= now ? 'InProgress' : 'Upcoming');
+
   return {
     id: String(dto.id),
     goal: dto.name ?? 'Untitled sprint',
-    startDate: new Date(dto.startDate),
-    endDate: new Date(dto.endDate),
+    startDate,
+    endDate,
+    status: resolvedStatus,
     joinCode: dto.joinCode ?? undefined,
   };
+}
+
+function normalizeSprintStatus(status: SprintApiResponse['status']): SprintStatus | null {
+  const normalized = String(status ?? '').replace(/[-_\s]+/g, '').toLowerCase();
+
+  if (normalized === 'upcoming') {
+    return 'Upcoming';
+  }
+
+  if (normalized === 'inprogress') {
+    return 'InProgress';
+  }
+
+  if (normalized === 'done') {
+    return 'Done';
+  }
+
+  return null;
 }
 
 @Injectable({ providedIn: 'root' })

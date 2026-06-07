@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as api from '../data/backend-api';
-import { Sprint } from '../../types/sprint';
+import { Sprint, type SprintStatus } from '../../types/sprint';
 import { UserStory } from '../../types/userStory';
 
 @Injectable({ providedIn: 'root' })
@@ -11,6 +11,8 @@ export class SprintService {
     getStories(id: string) { return api.getUserStoriesBySprintFromBackend(id); }
     createSprint(sprint: Sprint, creatorUserId: number) { return api.createSprintFromBackend(sprint, creatorUserId); }
     updateSprint(sprint: Sprint) { return api.updateSprintFromBackend(sprint); }
+    updateSprintStatus(sprintId: string, status: SprintStatus) { return api.updateSprintStatusFromBackend(sprintId, status); }
+    finishSprint(sprintId: string) { return api.finishSprintFromBackend(sprintId); }
     createUserStory(story: UserStory) {
         return api.createUserStoryFromBackend(story);
     }

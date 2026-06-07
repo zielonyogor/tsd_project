@@ -38,6 +38,12 @@
   cursor: pointer;
 }
 
+.top-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .bar-container {
   display: flex;
   justify-content: space-between;
@@ -180,4 +186,35 @@
   margin: 10px 0;
   font-size: 0.9rem;
   color: #374151;
+}
+
+.sprint-status-line {
+  margin: 8px 0 0;
+  color: #374151;
+}
+
+.sprint-status-badge {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #075985;
+  background: #dbeafe;
+}
+
+.sprint-status-badge.done {
+  color: #134e4a;
+  background: #ccfbf1;
+}
+
+.finish-btn {
+  background: #0f766e;
+}
+
+.finish-btn:disabled,
+.add-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
