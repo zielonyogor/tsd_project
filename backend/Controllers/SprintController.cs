@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 using SprintTracker.Database.Data;
 using SprintTracker.Database.Models;
 using SprintTracker.DTO.Requests;
+using SprintTracker.Hubs;
 using SprintTracker.Mapper;
 
 namespace SprintTracker.Controllers
@@ -13,11 +15,13 @@ namespace SprintTracker.Controllers
     {
         private readonly AppDbContext _context;
         private readonly SprintMapper _sprintMapper;
+        private readonly IHubContext<SprintHub> _hub;
 
-        public SprintController(AppDbContext context, SprintMapper sprintMapper)
+        public SprintController(AppDbContext context, SprintMapper sprintMapper, IHubContext<SprintHub> hub)
         {
             _context = context;
             _sprintMapper = sprintMapper;
+            _hub = hub;
         }
 
         [HttpGet("user/{userId}")]
@@ -77,7 +81,7 @@ namespace SprintTracker.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateSprint(int id, [FromBody] CreateSprintRequest request)
+        public async Task<IActionResult> UpdateSprint(int id, [FromBody] CreateSprintRequest request)
         {
             var sprint = _context.Sprints.Find(id);
             if (sprint == null)
@@ -90,6 +94,11 @@ namespace SprintTracker.Controllers
             sprint.EndDate = request.EndDate;
 
             _context.SaveChanges();
+
+            await _hub.Clients
+                .Group(SprintHub.GroupName(sprint.Id))
+                .SendAsync("sprintUpdated", sprint);
+
             return Ok(sprint);
         }
     }

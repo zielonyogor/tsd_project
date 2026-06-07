@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using SprintTracker.Database.Data;
+using SprintTracker.Hubs;
 using SprintTracker.Mapper;
 
 namespace SprintTracker
@@ -20,7 +21,8 @@ namespace SprintTracker
                     policy
                         .WithOrigins("http://localhost:3000")
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
             builder.Services.AddControllers()
@@ -30,6 +32,11 @@ namespace SprintTracker
                 });
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddSignalR()
+                .AddJsonProtocol(options =>
+                {
+                    options.PayloadSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+                });
             builder.Services.AddSingleton<UserStoryMapper>();
             builder.Services.AddSingleton<SprintMapper>();
             builder.Services.AddSingleton<UserMapper>();
@@ -52,6 +59,7 @@ namespace SprintTracker
 
 
             app.MapControllers();
+            app.MapHub<SprintHub>("/hubs/sprint");
 
             app.Run();
         }

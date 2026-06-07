@@ -1,12 +1,14 @@
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, type ParamMap } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import type { Sprint } from '../../../types/sprint';
 import { USER_STORY_STATUSES, UserStoryStatus, type UserStory } from '../../../types/userStory';
 import { UserStoryCard } from './components/user-story-card/user-story-card';
 import { ProgressBar } from './components/progress-bar/progress-bar';
 import { SprintService } from './../../services/sprint.service';
+import { RealtimeSprintService } from './../../services/realtime-sprint.service';
 import type { User } from '../../../types/user';
 import { getCurrentUser } from '../../data/user-storage';
 
@@ -16,7 +18,7 @@ import { getCurrentUser } from '../../data/user-storage';
   styleUrl: './board.scss',
   imports: [DatePipe, FormsModule, UserStoryCard, ProgressBar],
 })
-export class Board implements OnInit {
+export class Board implements OnInit, OnDestroy {
   protected currentUser: User | null = null;
   protected readonly columns = USER_STORY_STATUSES;
   protected readonly newStoryForm = {
@@ -44,6 +46,8 @@ export class Board implements OnInit {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly service = inject(SprintService);
+  private readonly realtime = inject(RealtimeSprintService);
+  private readonly realtimeSubscriptions = new Subscription();
 
   ngOnInit(): void {
     this.currentUser = getCurrentUser();
@@ -61,6 +65,55 @@ export class Board implements OnInit {
 
       void this.loadBoard(boardId);
     });
+
+    this.subscribeToRealtimeUpdates();
+  }
+
+  ngOnDestroy(): void {
+    this.realtimeSubscriptions.unsubscribe();
+    void this.realtime.leaveSprint();
+  }
+
+  private subscribeToRealtimeUpdates(): void {
+    this.realtimeSubscriptions.add(
+      this.realtime.onUserStoryCreated.subscribe(story => {
+        if (!this.sprint || story.sprintId !== this.sprint.id) {
+          return;
+        }
+        if (this.userStories.some(existing => existing.id === story.id)) {
+          return;
+        }
+        this.userStories = [...this.userStories, story];
+        this.cdr.markForCheck();
+      }),
+    );
+
+    this.realtimeSubscriptions.add(
+      this.realtime.onUserStoryUpdated.subscribe(story => {
+        if (!this.sprint || story.sprintId !== this.sprint.id) {
+          return;
+        }
+        const existing = this.userStories.find(item => item.id === story.id);
+        if (!existing) {
+          this.userStories = [...this.userStories, story];
+        } else {
+          existing.title = story.title;
+          existing.description = story.description;
+          existing.status = story.status;
+        }
+        this.cdr.markForCheck();
+      }),
+    );
+
+    this.realtimeSubscriptions.add(
+      this.realtime.onSprintUpdated.subscribe(updated => {
+        if (!this.sprint || updated.id !== this.sprint.id) {
+          return;
+        }
+        this.sprint = { ...this.sprint, ...updated };
+        this.cdr.markForCheck();
+      }),
+    );
   }
 
   protected get joinUrl(): string {
@@ -197,6 +250,11 @@ export class Board implements OnInit {
       this.sprint = sprint;
       this.userStories = await this.service.getStories(boardId);
       this.cdr.markForCheck();
+      try {
+        await this.realtime.joinSprint(sprint.id);
+      } catch {
+        // realtime is best-effort; manual refresh still works
+      }
     } catch {
       this.loadError = 'Could not load sprint board from backend.';
       this.sprint = null;

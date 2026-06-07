@@ -1,9 +1,11 @@
 using System.Linq;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 using SprintTracker.Database.Data;
 using SprintTracker.DTO.Requests;
+using SprintTracker.Hubs;
 using SprintTracker.Mapper;
 
 namespace SprintTracker.Controllers
@@ -14,11 +16,13 @@ namespace SprintTracker.Controllers
     {
         private readonly AppDbContext _context;
         private readonly UserStoryMapper _mapper;
+        private readonly IHubContext<SprintHub> _hub;
 
-        public UserStoryController(AppDbContext context, UserStoryMapper mapper)
+        public UserStoryController(AppDbContext context, UserStoryMapper mapper, IHubContext<SprintHub> hub)
         {
             _context = context;
             _mapper = mapper;
+            _hub = hub;
         }
 
         [HttpGet]
@@ -36,17 +40,25 @@ namespace SprintTracker.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateUserStory(CreateUserStoryRequest userStory)
+        public async Task<IActionResult> CreateUserStory(CreateUserStoryRequest userStory)
         {
             var newUserStory = _mapper.MapToUserStory(userStory);
 
             _context.UserStories.Add(newUserStory);
             _context.SaveChanges();
+
+            if (newUserStory.SprintId.HasValue)
+            {
+                await _hub.Clients
+                    .Group(SprintHub.GroupName(newUserStory.SprintId.Value))
+                    .SendAsync("userStoryCreated", newUserStory);
+            }
+
             return CreatedAtAction(nameof(GetUserStories), null, newUserStory);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateUserStory(int id, UpdateUserStoryRequest userStory)
+        public async Task<IActionResult> UpdateUserStory(int id, UpdateUserStoryRequest userStory)
         {
             var existingUserStory = _context.UserStories.Find(id);
             if (existingUserStory == null)
@@ -56,6 +68,14 @@ namespace SprintTracker.Controllers
 
             _mapper.MapToUserStory(userStory, existingUserStory);
             _context.SaveChanges();
+
+            if (existingUserStory.SprintId.HasValue)
+            {
+                await _hub.Clients
+                    .Group(SprintHub.GroupName(existingUserStory.SprintId.Value))
+                    .SendAsync("userStoryUpdated", existingUserStory);
+            }
+
             return NoContent();
         }
     }
