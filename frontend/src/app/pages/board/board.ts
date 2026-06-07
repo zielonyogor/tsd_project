@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angula
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, type ParamMap } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+// @ts-expect-error: missing rxjs types
 import { Subscription } from 'rxjs';
 import type { Sprint, SprintStatus } from '../../../types/sprint';
 import { USER_STORY_STATUSES, UserStoryStatus, type UserStory } from '../../../types/userStory';
@@ -78,7 +79,7 @@ export class Board implements OnInit, OnDestroy {
 
   private subscribeToRealtimeUpdates(): void {
     this.realtimeSubscriptions.add(
-      this.realtime.onUserStoryCreated.subscribe(story => {
+      this.realtime.onUserStoryCreated.subscribe((story: UserStory) => {
         if (!this.sprint || story.sprintId !== this.sprint.id) {
           return;
         }
@@ -91,7 +92,7 @@ export class Board implements OnInit, OnDestroy {
     );
 
     this.realtimeSubscriptions.add(
-      this.realtime.onUserStoryUpdated.subscribe(story => {
+      this.realtime.onUserStoryUpdated.subscribe((story: UserStory) => {
         if (!this.sprint || story.sprintId !== this.sprint.id) {
           return;
         }
@@ -108,7 +109,7 @@ export class Board implements OnInit, OnDestroy {
     );
 
     this.realtimeSubscriptions.add(
-      this.realtime.onSprintUpdated.subscribe(updated => {
+      this.realtime.onSprintUpdated.subscribe((updated: Sprint) => {
         if (!this.sprint || updated.id !== this.sprint.id) {
           return;
         }
