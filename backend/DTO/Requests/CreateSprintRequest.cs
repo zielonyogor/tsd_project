@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+using SprintTracker.Database.Models;
+
 namespace SprintTracker.DTO.Requests
 {
     public class CreateSprintRequest
@@ -8,6 +10,7 @@ namespace SprintTracker.DTO.Requests
         public required string Name { get; set; }
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
         public DateTime EndDate { get; set; } = DateTime.UtcNow.AddDays(1);
+        public SprintStatus? Status { get; set; }
         public int CreatorUserId { get; set; }
     }
 }

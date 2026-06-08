@@ -91,7 +91,23 @@
     flex: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+}
+
+.sprint-sections {
+    width: min(1100px, 100%);
+    display: grid;
+    gap: 20px;
+}
+
+.sprint-section {
+    display: grid;
+    gap: 10px;
+}
+
+.section-title {
+    margin: 0;
+    color: #1f2937;
 }
 
 .sprint-list {
@@ -152,6 +168,29 @@
     all: unset;
     cursor: pointer;
     display: block;
+}
+
+.status-line {
+    margin: 4px 0 0;
+}
+
+.status-badge {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0f5132;
+    background: #d1f4df;
+    border-radius: 999px;
+    padding: 3px 10px;
+}
+
+.status-badge.done {
+    color: #134e4a;
+    background: #ccfbf1;
+}
+
+.done-card {
+    background-color: #cbe5d7;
 }
 
 .card-action-btn {

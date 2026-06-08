@@ -24,7 +24,8 @@ describe('Board', () => {
     getSprintForUser: vi.fn(),
     getStories: vi.fn(),
     createUserStory: vi.fn(),
-    updateUserStory: vi.fn()
+    updateUserStory: vi.fn(),
+    finishSprint: vi.fn()
   };
 
   const mockRealtimeSprintService = {
@@ -67,7 +68,10 @@ describe('Board', () => {
 
     vi.clearAllMocks();
     mockSprintService.getSprints.mockResolvedValue(FAKE_SPRINTS);
-    mockSprintService.getSprintForUser.mockResolvedValue(FAKE_SPRINT_BOARDS['1'].sprint);
+    mockSprintService.getSprintForUser.mockResolvedValue({
+      ...FAKE_SPRINT_BOARDS['1'].sprint,
+      status: 'InProgress'
+    });
     mockSprintService.getStories.mockResolvedValue(FAKE_SPRINT_BOARDS['1'].userStories);
     mockSprintService.createUserStory.mockImplementation((story) => 
       Promise.resolve({ ...story, id: Math.floor(Math.random() * 1000).toString() })
@@ -112,7 +116,10 @@ describe('Board', () => {
   it('loads sprint data from the route param id', async () => {
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(component.sprint).toEqual(FAKE_SPRINT_BOARDS['1'].sprint);
+    expect(component.sprint).toEqual({
+      ...FAKE_SPRINT_BOARDS['1'].sprint,
+      status: 'InProgress'
+    });
     expect(component.getUserStoriesForColumn('To Do')).toEqual([
       FAKE_SPRINT_BOARDS['1'].userStories[0],
     ]);
@@ -377,5 +384,94 @@ describe('Board', () => {
     const lastStory = inProgressStories[inProgressStories.length - 1];
 
     expect(lastStory.title).toBe('Second story');
+  });
+
+  it('displays the correct sprint status label', () => {
+    const board = component as unknown as { sprintStatusLabel: (status: string) => string };
+    expect(board.sprintStatusLabel('InProgress')).toBe('In progress');
+    expect(board.sprintStatusLabel('Upcoming')).toBe('Upcoming');
+    expect(board.sprintStatusLabel('Done')).toBe('Done');
+  });
+
+  it('prevents adding a user story if the sprint is "Done"', () => {
+    component.sprint = { ...FAKE_SPRINT_BOARDS['1'].sprint, status: 'Done' };
+    const board = component as unknown as {
+      onAddStory: () => void;
+      isCreatingStory: boolean;
+    };
+    
+    board.isCreatingStory = false;
+    board.onAddStory();
+    
+    expect(board.isCreatingStory).toBe(false);
+  });
+
+  it('prevents editing a user story if the sprint is "Done"', () => {
+    component.sprint = { ...FAKE_SPRINT_BOARDS['1'].sprint, status: 'Done' };
+    const board = component as unknown as {
+      onOpenStory: (story: (typeof FAKE_SPRINT_BOARDS)['1']['userStories'][number]) => void;
+      isEditingStory: boolean;
+    };
+    const story = FAKE_SPRINT_BOARDS['1'].userStories[0];
+
+    board.isEditingStory = false;
+    board.onOpenStory(story);
+
+    expect(board.isEditingStory).toBe(false);
+  });
+
+  it('prevents saving a user story if the sprint is "Done"', () => {
+    component.sprint = { ...FAKE_SPRINT_BOARDS['1'].sprint, status: 'Done' };
+    const board = component as unknown as {
+      saveStory: () => void;
+      editingStoryId: string;
+      editStoryError: string;
+    };
+    
+    board.editingStoryId = '1';
+    board.saveStory();
+    
+    expect(board.editStoryError).toBe(''); // Stays empty
+  });
+
+  it('finishes the sprint successfully and updates the status', async () => {
+    const finishSprintMock = vi.fn().mockResolvedValue({
+      ...FAKE_SPRINT_BOARDS['1'].sprint,
+      status: 'Done',
+    });
+    mockSprintService.finishSprint = finishSprintMock;
+    
+    component.sprint = { ...FAKE_SPRINT_BOARDS['1'].sprint, status: 'InProgress' };
+    
+    const board = component as unknown as {
+      finishSprint: () => Promise<void>;
+      isFinishingSprint: boolean;
+    };
+
+    await board.finishSprint();
+
+    expect(finishSprintMock).toHaveBeenCalledWith('1');
+    expect(component.sprint!.status).toBe('Done');
+    expect(board.isFinishingSprint).toBe(false);
+  });
+
+  it('handles errors when finishing the sprint fails', async () => {
+    const finishSprintMock = vi.fn().mockRejectedValue(new Error('Backend error'));
+    mockSprintService.finishSprint = finishSprintMock;
+    
+    component.sprint = { ...FAKE_SPRINT_BOARDS['1'].sprint, status: 'InProgress' };
+    
+    const board = component as unknown as {
+      finishSprint: () => Promise<void>;
+      finishSprintError: string;
+      isFinishingSprint: boolean;
+    };
+
+    await board.finishSprint();
+
+    expect(finishSprintMock).toHaveBeenCalledWith('1');
+    expect(component.sprint!.status).toBe('InProgress');
+    expect(board.finishSprintError).toBe('Failed to finish sprint. Please try again.');
+    expect(board.isFinishingSprint).toBe(false);
   });
 });

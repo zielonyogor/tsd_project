@@ -28,6 +28,7 @@ namespace SprintTracker.Tests.Controllers
             var sprints = okResult.Value.Should().BeAssignableTo<IEnumerable<Sprint>>().Subject;
             sprints.Should().HaveCount(1);
             sprints.First().Name.Should().Be("Sprint 1");
+            sprints.First().Status.Should().Be(SprintStatus.InProgress);
         }
 
         [Fact]
@@ -121,6 +122,58 @@ namespace SprintTracker.Tests.Controllers
 
             result.Should().BeOfType<OkObjectResult>();
             context.Sprints.Find(1)!.Name.Should().Be("Updated Sprint");
+            context.Sprints.Find(1)!.Status.Should().Be(SprintStatus.InProgress);
+        }
+
+        [Fact]
+        public async Task UpdateSprintStatus_ShouldSetRequestedStatus()
+        {
+            using var context = GetDatabaseContext();
+            SeedSprints(context);
+            var mapper = new SprintMapper();
+            var controller = new SprintController(context, mapper, CreateHubContext());
+
+            var result = await controller.UpdateSprintStatus(1, new UpdateSprintStatusRequest
+            {
+                Status = SprintStatus.Done
+            });
+
+            result.Should().BeOfType<OkObjectResult>();
+            context.Sprints.Find(1)!.Status.Should().Be(SprintStatus.Done);
+        }
+
+        [Fact]
+        public async Task FinishSprint_ShouldSetStatusToDone()
+        {
+            using var context = GetDatabaseContext();
+            SeedSprints(context);
+            var mapper = new SprintMapper();
+            var controller = new SprintController(context, mapper, CreateHubContext());
+
+            var result = await controller.FinishSprint(1);
+
+            result.Should().BeOfType<OkObjectResult>();
+            context.Sprints.Find(1)!.Status.Should().Be(SprintStatus.Done);
+        }
+
+        [Fact]
+        public void GetSprintForUser_ShouldAutoMarkDone_WhenEndDateIsPast()
+        {
+            using var context = GetDatabaseContext();
+            SeedSprintsWithMembers(context);
+            var sprint = context.Sprints.Find(1)!;
+            sprint.EndDate = DateTime.UtcNow.AddDays(-1);
+            sprint.Status = SprintStatus.InProgress;
+            context.SaveChanges();
+
+            var mapper = new SprintMapper();
+            var controller = new SprintController(context, mapper, CreateHubContext());
+
+            var result = controller.GetSprintForUser(1, 1);
+
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var updatedSprint = okResult.Value.Should().BeAssignableTo<Sprint>().Subject;
+            updatedSprint.Status.Should().Be(SprintStatus.Done);
         }
 
         private AppDbContext GetDatabaseContext()
@@ -135,7 +188,13 @@ namespace SprintTracker.Tests.Controllers
 
         private void SeedSprints(AppDbContext context)
         {
-            context.Sprints.Add(new Sprint { Id = 1, Name = "Sprint 1" });
+            context.Sprints.Add(new Sprint
+            {
+                Id = 1,
+                Name = "Sprint 1",
+                StartDate = DateTime.UtcNow.AddDays(-1),
+                EndDate = DateTime.UtcNow.AddDays(7)
+            });
             context.SaveChanges();
         }
 
@@ -151,7 +210,13 @@ namespace SprintTracker.Tests.Controllers
                 new User { Id = 1, Name = "Alice", PasswordHash = "hashedpassword" },
                 new User { Id = 2, Name = "Bob", PasswordHash = "hashedpassword" }
             );
-            context.Sprints.Add(new Sprint { Id = 1, Name = "Sprint 1" });
+            context.Sprints.Add(new Sprint
+            {
+                Id = 1,
+                Name = "Sprint 1",
+                StartDate = DateTime.UtcNow.AddDays(-2),
+                EndDate = DateTime.UtcNow.AddDays(5)
+            });
             context.SprintMembers.Add(new SprintMember { Id = 1, SprintId = 1, UserId = 1 });
             context.SaveChanges();
         }

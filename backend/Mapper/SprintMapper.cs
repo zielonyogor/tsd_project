@@ -11,7 +11,8 @@ namespace SprintTracker.Mapper
             {
                 Name = request.Name,
                 StartDate = request.StartDate,
-                EndDate = request.EndDate
+                EndDate = request.EndDate,
+                Status = request.Status ?? SprintStatus.Upcoming
             };
         }
     }

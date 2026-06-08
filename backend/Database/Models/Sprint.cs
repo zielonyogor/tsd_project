@@ -6,6 +6,7 @@ namespace SprintTracker.Database.Models
         public required string Name { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public SprintStatus Status { get; set; } = SprintStatus.Upcoming;
         public List<UserStory> UserStories { get; set; } = new List<UserStory>();
         public string JoinCode { get; set; }
         public List<SprintMember> SprintMembers { get; set; } = new List<SprintMember>();

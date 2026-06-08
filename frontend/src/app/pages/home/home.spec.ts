@@ -15,6 +15,7 @@ describe('Home', () => {
 
   const mockSprintService = {
     getSprints: vi.fn(),
+    getSprintsForUser: vi.fn(),
     createSprint: vi.fn(),
   };
 
@@ -24,6 +25,7 @@ describe('Home', () => {
       goal: string;
       startDate: Date;
       endDate: Date;
+      status: 'Upcoming' | 'InProgress' | 'Done';
     }[];
     createError: string;
     isCreatingSprint: boolean;
@@ -74,6 +76,7 @@ describe('Home', () => {
     vi.clearAllMocks();
 
     mockSprintService.getSprints.mockResolvedValue(FAKE_SPRINTS);
+    mockSprintService.getSprintsForUser.mockResolvedValue(FAKE_SPRINTS);
 
     mockSprintService.createSprint.mockImplementation((sprint) =>
       Promise.resolve(sprint),
@@ -156,6 +159,7 @@ describe('Home', () => {
       goal: 'Ship release dashboard',
       startDate: new Date(2026, 3, 1),
       endDate: new Date(2026, 3, 14),
+      status: 'InProgress',
     });
 
     const home = component as unknown as HomeTestAccess;

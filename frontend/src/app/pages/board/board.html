@@ -11,12 +11,25 @@
     <div class="bar-title">
         <h1 class="title">Sprint Board <span class="sprint-time">{{ sprint.startDate | date:'shortDate' }} - {{ sprint.endDate | date:'shortDate' }}</span></h1>
         <h2 class="sprint-goal">Sprint Goal: {{ sprint.goal }}</h2>
+                <p class="sprint-status-line">
+                    Status: <span class="sprint-status-badge" [class.done]="sprint.status === 'Done'">{{ sprintStatusLabel(sprint.status) }}</span>
+                </p>
         @if (sprint.joinCode) {
             <p class="join-code">Join code: <strong>{{ sprint.joinCode }}</strong></p>
         }
+                @if (finishSprintError) {
+                    <p class="error-msg">{{ finishSprintError }}</p>
+                }
     </div>
 
-    <button class="add-btn" (click)="onAddStory()">+ Add User Story</button>
+        <div class="top-actions">
+            @if (sprint.status !== 'Done') {
+                <button class="card-action-btn finish-btn" type="button" [disabled]="isFinishingSprint" (click)="finishSprint()">
+                    {{ isFinishingSprint ? 'Finishing...' : 'Finish sprint' }}
+                </button>
+            }
+            <button class="add-btn" (click)="onAddStory()" [disabled]="sprint.status === 'Done'">+ Add User Story</button>
+        </div>
 </div>
 
 <div class="sprint-board">

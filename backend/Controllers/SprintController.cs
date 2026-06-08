@@ -36,6 +36,17 @@ namespace SprintTracker.Controllers
                 .Where(s => sprintIds.Contains(s.Id))
                 .ToList();
 
+            var hasChanges = false;
+            foreach (var sprint in sprints)
+            {
+                hasChanges |= ApplyAutomaticStatus(sprint);
+            }
+
+            if (hasChanges)
+            {
+                _context.SaveChanges();
+            }
+
             return Ok(sprints);
         }
 
@@ -54,6 +65,11 @@ namespace SprintTracker.Controllers
                 return NotFound();
             }
 
+            if (ApplyAutomaticStatus(sprint))
+            {
+                _context.SaveChanges();
+            }
+
             return Ok(sprint);
         }
 
@@ -67,6 +83,7 @@ namespace SprintTracker.Controllers
             }
 
             var sprint = _sprintMapper.MapToSprint(request);
+            ApplyAutomaticStatus(sprint);
             _context.Sprints.Add(sprint);
             _context.SaveChanges();
 
@@ -92,6 +109,12 @@ namespace SprintTracker.Controllers
             sprint.Name = request.Name;
             sprint.StartDate = request.StartDate;
             sprint.EndDate = request.EndDate;
+            if (request.Status.HasValue)
+            {
+                sprint.Status = request.Status.Value;
+            }
+
+            ApplyAutomaticStatus(sprint);
 
             _context.SaveChanges();
 
@@ -100,6 +123,78 @@ namespace SprintTracker.Controllers
                 .SendAsync("sprintUpdated", sprint);
 
             return Ok(sprint);
+        }
+
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateSprintStatus(int id, [FromBody] UpdateSprintStatusRequest request)
+        {
+            var sprint = _context.Sprints.Find(id);
+            if (sprint == null)
+            {
+                return NotFound();
+            }
+
+            if (sprint.EndDate < DateTime.UtcNow && request.Status != SprintStatus.Done)
+            {
+                return BadRequest("A sprint with past end date can only have status Done.");
+            }
+
+            sprint.Status = request.Status;
+            ApplyAutomaticStatus(sprint);
+            _context.SaveChanges();
+
+            await _hub.Clients
+                .Group(SprintHub.GroupName(sprint.Id))
+                .SendAsync("sprintUpdated", sprint);
+
+            return Ok(sprint);
+        }
+
+        [HttpPut("{id}/finish")]
+        public async Task<IActionResult> FinishSprint(int id)
+        {
+            var sprint = _context.Sprints.Find(id);
+            if (sprint == null)
+            {
+                return NotFound();
+            }
+
+            sprint.Status = SprintStatus.Done;
+            _context.SaveChanges();
+
+            await _hub.Clients
+                .Group(SprintHub.GroupName(sprint.Id))
+                .SendAsync("sprintUpdated", sprint);
+
+            return Ok(sprint);
+        }
+
+        private static bool ApplyAutomaticStatus(Sprint sprint)
+        {
+            if (sprint.EndDate < DateTime.UtcNow)
+            {
+                if (sprint.Status != SprintStatus.Done)
+                {
+                    sprint.Status = SprintStatus.Done;
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (sprint.StartDate <= DateTime.UtcNow && sprint.Status == SprintStatus.Upcoming)
+            {
+                sprint.Status = SprintStatus.InProgress;
+                return true;
+            }
+
+            if (sprint.StartDate > DateTime.UtcNow && sprint.Status == SprintStatus.InProgress)
+            {
+                sprint.Status = SprintStatus.Upcoming;
+                return true;
+            }
+
+            return false;
         }
     }
 }
