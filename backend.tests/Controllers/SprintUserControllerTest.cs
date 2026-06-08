@@ -19,12 +19,9 @@ namespace SprintTracker.Tests.Controllers
         {
             using var context = GetDatabaseContext();
             var controller = new SprintUserController(context, new UserMapper());
-            var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.RegisterUser(new RegisterUserRequest
             {
-                Name = "Developer",
-                Password = "password123"
                 Name = "Developer",
                 Password = "password123"
             });
@@ -38,7 +35,6 @@ namespace SprintTracker.Tests.Controllers
         public void RegisterUser_ShouldReturnBadRequest_WhenNameIsEmpty()
         {
             using var context = GetDatabaseContext();
-            var controller = new SprintUserController(context, new UserMapper());
             var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.RegisterUser(new RegisterUserRequest
@@ -66,36 +62,16 @@ namespace SprintTracker.Tests.Controllers
         }
 
         [Fact]
-        public void Login_ShouldReturnOkWithExistingUser_WhenUserExists()
-        {
-            using var context = GetDatabaseContext();
-            var controller = new SprintUserController(context, new UserMapper());
-
-            var result = controller.Login(new CreateUserRequest
-            {
-                Name = "FlowDeveloper",
-                Password = "dynamicPassword123"
-            };
-
-            var registerResult = controller.RegisterUser(credentials);
-
-            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-            var user = okResult.Value.Should().BeAssignableTo<User>().Subject;
-            user.Name.Should().Be("Alice");
-            context.Users.Should().HaveCount(2);
-        }
-
-        [Fact]
         public void RegisterAndLogin_ShouldPersistUserAndAllowSubsequentLogin()
         {
             using var context = GetDatabaseContext();
             var controller = new SprintUserController(context, new UserMapper());
 
-            var result = controller.Login(new CreateUserRequest
+            var credentials = new RegisterUserRequest
             {
-                Name = "NewUser",
-                Password = "password123"
-            });
+                Name = "FlowDeveloper",
+                Password = "dynamicPassword123"
+            };
 
             var registerResult = controller.RegisterUser(credentials);
 
@@ -132,7 +108,6 @@ namespace SprintTracker.Tests.Controllers
             SeedSprints(context);
             SeedUsers(context);
 
-            var controller = new SprintUserController(context, new UserMapper());
             var controller = new SprintUserController(context, new UserMapper());
 
             var result = controller.JoinSprint(1, new JoinSprintRequest
