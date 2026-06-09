@@ -33,6 +33,18 @@ namespace SprintTracker.Controllers
                 return NotFound();
             }
 
+            var stories = _context.UserStories.Where(us => us.SprintId == id).ToList();
+            if (stories.Any())
+            {
+                _context.UserStories.RemoveRange(stories);
+            }
+
+            var members = _context.SprintMembers.Where(sm => sm.SprintId == id).ToList();
+            if (members.Any())
+            {
+                _context.SprintMembers.RemoveRange(members);
+            }
+
             _context.Sprints.Remove(sprint);
             _context.SaveChanges();
 
