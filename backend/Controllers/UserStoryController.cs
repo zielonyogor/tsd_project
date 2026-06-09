@@ -32,6 +32,29 @@ namespace SprintTracker.Controllers
             return Ok(userStories);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUserStory(int id)
+        {
+            var story = _context.UserStories.Find(id);
+            if (story == null)
+            {
+                return NotFound();
+            }
+
+            var sprintId = story.SprintId;
+            _context.UserStories.Remove(story);
+            _context.SaveChanges();
+
+            if (sprintId.HasValue)
+            {
+                await _hub.Clients
+                    .Group(SprintHub.GroupName(sprintId.Value))
+                    .SendAsync("userStoryDeleted", story);
+            }
+
+            return NoContent();
+        }
+
         [HttpGet("{sprintId}")]
         public IActionResult GetUserStoriesBySprint(int sprintId)
         {

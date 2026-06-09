@@ -20,4 +20,12 @@ export class SprintService {
         return api.updateUserStoryFromBackend(story);
     }
     joinSprint(joinCode: string, userId: number) { return api.joinSprintFromBackend(joinCode, userId); }
+    
+    deleteSprint(sprintId: string) {
+        return api.deleteSprintFromBackend(sprintId);
+    }
+
+    deleteUserStory(userStoryId: string) {
+        return api.deleteUserStoryFromBackend(userStoryId);
+    }
 }

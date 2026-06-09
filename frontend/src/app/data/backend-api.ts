@@ -182,6 +182,26 @@ export async function joinSprintFromBackend(joinCode: string, userId: number): P
   return toSprint(sprintDto);
 }
 
+export async function deleteSprintFromBackend(sprintId: string): Promise<void> {
+  const response = await fetch(`${backendUrl}/Sprint/${sprintId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete sprint: ${response.status} ${response.statusText}`);
+  }
+}
+
+export async function deleteUserStoryFromBackend(storyId: string): Promise<void> {
+  const response = await fetch(`${backendUrl}/UserStory/${storyId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete user story: ${response.status} ${response.statusText}`);
+  }
+}
+
 export interface UserApiResponse {
   id: number;
   name: string;
