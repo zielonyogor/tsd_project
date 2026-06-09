@@ -30,6 +30,10 @@ export class Home implements OnInit {
   protected editingGoal = '';
   protected editingStartDate = '';
   protected editingEndDate = '';
+  protected confirmDeletingSprintId: string | null = null;
+  protected confirmDeletingSprintName = '';
+  protected isDeletingSprint = false;
+  protected deleteSprintError = '';
 
   protected readonly newSprintForm = {
     title: '',
@@ -288,6 +292,44 @@ export class Home implements OnInit {
       this.sprints = [];
     } finally {
       this.isLoading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+    protected askDeleteSprint(sprint: Sprint): void {
+    this.confirmDeletingSprintId = sprint.id;
+    this.confirmDeletingSprintName = sprint.goal;
+    this.deleteSprintError = '';
+  }
+
+  protected cancelDeleteSprint(): void {
+    this.confirmDeletingSprintId = null;
+    this.confirmDeletingSprintName = '';
+    this.deleteSprintError = '';
+  }
+
+  protected onDeleteSprintBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.cancelDeleteSprint();
+    }
+  }
+
+  protected async confirmDeleteSprint(): Promise<void> {
+    if (!this.confirmDeletingSprintId) {
+      return;
+    }
+
+    this.isDeletingSprint = true;
+    this.deleteSprintError = '';
+
+    try {
+      await this.service.deleteSprint(this.confirmDeletingSprintId);
+      this.sprints = this.sprints.filter(s => s.id !== this.confirmDeletingSprintId);
+      this.cancelDeleteSprint();
+    } catch {
+      this.deleteSprintError = 'Failed to delete sprint. Please try again.';
+    } finally {
+      this.isDeletingSprint = false;
       this.cdr.markForCheck();
     }
   }

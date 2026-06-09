@@ -24,6 +24,21 @@ namespace SprintTracker.Controllers
             _hub = hub;
         }
 
+        [HttpDelete("{id}")]
+        public IActionResult DeleteSprint(int id)
+        {
+            var sprint = _context.Sprints.Find(id);
+            if (sprint == null)
+            {
+                return NotFound();
+            }
+
+            _context.Sprints.Remove(sprint);
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
         [HttpGet("user/{userId}")]
         public IActionResult GetSprintsForUser(int userId)
         {

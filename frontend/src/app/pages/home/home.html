@@ -65,6 +65,37 @@
   </div>
 }
 
+@if (confirmDeletingSprintId) {
+  <div class="create-modal-backdrop" tabindex="0" (click)="onDeleteSprintBackdropClick($event)" (keyup.enter)="cancelDeleteSprint()" (keyup.space)="cancelDeleteSprint()" >
+      <section
+          class="create-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-sprint-title"
+      >
+          <div class="create-modal-header">
+              <h2 id="delete-sprint-title">Delete sprint</h2>
+              <button class="icon-close-btn" type="button" aria-label="Close delete confirmation" (click)="cancelDeleteSprint()">
+                  ×
+              </button>
+          </div>
+
+          <p>Are you sure you want to delete sprint "<strong>{{ confirmDeletingSprintName }}</strong>"?</p>
+
+          @if (deleteSprintError) {
+              <p class="error-msg">{{ deleteSprintError }}</p>
+          }
+
+          <div class="actions-row">
+              <button class="card-action-btn" type="button" [disabled]="isDeletingSprint" (click)="confirmDeleteSprint()">
+                  {{ isDeletingSprint ? 'Deleting…' : 'Delete sprint' }}
+              </button>
+              <button class="card-action-btn muted" type="button" (click)="cancelDeleteSprint()">Cancel</button>
+          </div>
+      </section>
+  </div>
+}
+
 @if (isLoading) {
   <p>Loading sprints...</p>
 }
@@ -121,6 +152,7 @@
                 </p>
               </button>
               <button class="card-action-btn" type="button" (click)="startEditingGoal(s)">Edit goal</button>
+              <button class="card-action-btn muted" type="button" (click)="askDeleteSprint(s)">Delete</button>
             }
           </article>
         }
@@ -135,6 +167,9 @@
       <div class="sprint-list">
         @for (s of completedSprints; track s.id) {
           <article class="sprint-card done-card">
+            <div class="actions-row">
+              <button class="card-action-btn muted" type="button" (click)="askDeleteSprint(s)">Delete</button>
+            </div>
             <button class="sprint-open-btn" type="button" (click)="goToSprint(s.id)">
               <h2>{{ s.goal }}</h2>
               <p>{{ s.startDate | date }} - {{ s.endDate | date }}</p>
