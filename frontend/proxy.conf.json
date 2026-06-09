@@ -1,0 +1,23 @@
+{
+  "/Sprint": {
+    "target": "http://backend:8080",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/SprintUser": {
+    "target": "http://backend:8080",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/UserStory": {
+    "target": "http://backend:8080",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/sprintHub": {
+    "target": "http://backend:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true
+  }
+}
