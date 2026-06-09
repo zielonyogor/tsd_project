@@ -121,6 +121,11 @@ namespace SprintTracker.Controllers
                 return BadRequest("User name and password are required");
             }
 
+            if (_context.Users.Any(u => u.Name == request.Name))
+            {
+                return BadRequest("User with this username already exists");
+            }
+
             var user = _userMapper.MapToUser(request);
 
             _context.Users.Add(user);
@@ -143,9 +148,10 @@ namespace SprintTracker.Controllers
 
             if (user == null || !_userMapper.VerifyPassword(request.Password, user.PasswordHash))
             {
-                user = _userMapper.MapToUser(request);
-                _context.Users.Add(user);
-                _context.SaveChanges();
+                // user = _userMapper.MapToUser(request);
+                // _context.Users.Add(user);
+                // _context.SaveChanges();
+                return BadRequest("Incorrect username or password");
             }
 
             var response = _userMapper.MapToLoginUserResponse(user);
