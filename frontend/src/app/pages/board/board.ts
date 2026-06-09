@@ -215,7 +215,11 @@ export class Board implements OnInit, OnDestroy {
     void (async () => {
       try {
         const createdStory = await this.service.createUserStory(story);
-        this.userStories.push(createdStory);
+
+        if (!this.userStories.some(existing => existing.id === createdStory.id)) {
+          this.userStories.push(createdStory);
+        }
+
         this.createStoryError = '';
         this.isCreatingStory = false;
         this.cdr.markForCheck();
