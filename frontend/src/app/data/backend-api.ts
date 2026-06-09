@@ -195,7 +195,7 @@ export async function loginUserFromBackend(name: string, password: string): Prom
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to log in: ${response.status} ${response.statusText}`);
+    throw new Error(`Failed to log in: ${(await response.text()).toString()}`);
   }
 
   return response.json() as Promise<UserApiResponse>;
@@ -209,7 +209,7 @@ export async function registerUserFromBackend(name: string, password: string): P
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to register: ${response.status} ${response.statusText}`);
+    throw new Error(`Failed to register: ${(await response.text()).toString()}`);
   }
 
   return response.json() as Promise<UserApiResponse>;

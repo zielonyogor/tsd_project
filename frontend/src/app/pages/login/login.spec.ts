@@ -100,7 +100,8 @@ describe('Login', () => {
   });
 
   it('shows an error when login fails', async () => {
-    mockUserService.loginUser.mockRejectedValueOnce(new Error('network error'));
+    const errMessage = 'Could not log in. Please try again.';
+    mockUserService.loginUser.mockRejectedValueOnce(new Error(errMessage));
 
     const login = component as unknown as {
       userName: string;
@@ -115,7 +116,7 @@ describe('Login', () => {
 
     await login.login();
 
-    expect(login.loginError).toBe('Could not log in. Please try again.');
+    expect(login.loginError).toBe(errMessage);
     expect(login.isLoggingIn).toBe(false);
   });
 });
