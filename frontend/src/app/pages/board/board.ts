@@ -40,6 +40,11 @@ export class Board implements OnInit, OnDestroy {
   protected isFinishingSprint = false;
   protected finishSprintError = '';
 
+  protected confirmDeletingStoryId: string | null = null;
+  protected confirmDeletingStoryTitle = '';
+  protected isDeletingStory = false;
+  protected deleteStoryError = '';
+
   public sprint: Sprint | null = null;
   protected userStories: UserStory[] = [];
   private editingStoryId: string | null = null;
@@ -210,7 +215,11 @@ export class Board implements OnInit, OnDestroy {
     void (async () => {
       try {
         const createdStory = await this.service.createUserStory(story);
-        this.userStories.push(createdStory);
+
+        if (!this.userStories.some(existing => existing.id === createdStory.id)) {
+          this.userStories.push(createdStory);
+        }
+
         this.createStoryError = '';
         this.isCreatingStory = false;
         this.cdr.markForCheck();
@@ -298,6 +307,44 @@ export class Board implements OnInit, OnDestroy {
       void this.router.navigate(['/']);
     } finally {
       this.isLoading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+    protected askDeleteStory(story: UserStory): void {
+    this.confirmDeletingStoryId = story.id;
+    this.confirmDeletingStoryTitle = story.title;
+    this.deleteStoryError = '';
+  }
+
+  protected cancelDeleteStory(): void {
+    this.confirmDeletingStoryId = null;
+    this.confirmDeletingStoryTitle = '';
+    this.deleteStoryError = '';
+  }
+
+  protected onDeleteStoryBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.cancelDeleteStory();
+    }
+  }
+
+  protected async confirmDeleteStory(): Promise<void> {
+    if (!this.confirmDeletingStoryId) {
+      return;
+    }
+
+    this.isDeletingStory = true;
+    this.deleteStoryError = '';
+
+    try {
+      await this.service.deleteUserStory(this.confirmDeletingStoryId);
+      this.userStories = this.userStories.filter(story => story.id !== this.confirmDeletingStoryId);
+      this.cancelDeleteStory();
+    } catch {
+      this.deleteStoryError = 'Failed to delete user story. Please try again.';
+    } finally {
+      this.isDeletingStory = false;
       this.cdr.markForCheck();
     }
   }

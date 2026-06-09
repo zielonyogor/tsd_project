@@ -42,8 +42,11 @@ export class Login implements OnInit {
       const user = await this.service.loginUser(name, this.password);
       saveCurrentUser(user);
       void this.router.navigate(['/']);
-    } catch {
-      this.loginError = 'Could not log in. Please try again.';
+    } catch(e) {
+      if (e instanceof Error)
+        this.loginError = e.message;
+      else
+        this.loginError = 'Could not log in. Please try again.';
     } finally {
       this.isLoggingIn = false;
       this.cdr.markForCheck();

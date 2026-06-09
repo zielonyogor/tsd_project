@@ -30,8 +30,11 @@ export class Register {
       await this.service.registerUser(this.userName, this.password);
       alert('Registration successful!');
       await this.router.navigate(['/login']);
-    } catch {
-      alert('Registration failed!');
+    } catch(e) {
+      if (e instanceof Error)
+        alert(e.message)
+      else
+        alert('Registration failed!');
     } finally {
       this.isRegistering = false;
     }

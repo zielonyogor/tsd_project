@@ -182,6 +182,26 @@ export async function joinSprintFromBackend(joinCode: string, userId: number): P
   return toSprint(sprintDto);
 }
 
+export async function deleteSprintFromBackend(sprintId: string): Promise<void> {
+  const response = await fetch(`${backendUrl}/Sprint/${sprintId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete sprint: ${response.status} ${response.statusText}`);
+  }
+}
+
+export async function deleteUserStoryFromBackend(storyId: string): Promise<void> {
+  const response = await fetch(`${backendUrl}/UserStory/${storyId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete user story: ${response.status} ${response.statusText}`);
+  }
+}
+
 export interface UserApiResponse {
   id: number;
   name: string;
@@ -195,7 +215,7 @@ export async function loginUserFromBackend(name: string, password: string): Prom
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to log in: ${response.status} ${response.statusText}`);
+    throw new Error(`Failed to log in: ${(await response.text()).toString()}`);
   }
 
   return response.json() as Promise<UserApiResponse>;
@@ -209,7 +229,7 @@ export async function registerUserFromBackend(name: string, password: string): P
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to register: ${response.status} ${response.statusText}`);
+    throw new Error(`Failed to register: ${(await response.text()).toString()}`);
   }
 
   return response.json() as Promise<UserApiResponse>;

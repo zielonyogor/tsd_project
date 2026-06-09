@@ -6,6 +6,37 @@
     <p class="error-msg">{{ loadError }}</p>
 }
 
+@if (confirmDeletingStoryId) {
+    <div class="create-modal-backdrop" tabindex="0" (click)="onDeleteStoryBackdropClick($event)" (keyup.enter)="cancelDeleteStory()" (keyup.space)="cancelDeleteStory()" >
+        <section
+            class="create-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-story-title"
+        >
+            <div class="create-modal-header">
+                <h2 id="delete-story-title">Delete user story</h2>
+                <button class="icon-close-btn" type="button" aria-label="Close delete confirmation" (click)="cancelDeleteStory()">
+                    ×
+                </button>
+            </div>
+
+            <p>Are you sure you want to delete user story "<strong>{{ confirmDeletingStoryTitle }}</strong>"?</p>
+
+            @if (deleteStoryError) {
+                <p class="error-msg">{{ deleteStoryError }}</p>
+            }
+
+            <div class="actions-row">
+                <button class="card-action-btn" type="button" [disabled]="isDeletingStory" (click)="confirmDeleteStory()">
+                    {{ isDeletingStory ? 'Deleting…' : 'Delete story' }}
+                </button>
+                <button class="card-action-btn muted" type="button" (click)="cancelDeleteStory()">Cancel</button>
+            </div>
+        </section>
+    </div>
+}
+
 @if (sprint) {
 <div class="bar-container">
     <div class="bar-title">
@@ -38,7 +69,11 @@
         <h2>{{ column }}</h2>
         <div class="user-story-list">
             @for (story of getUserStoriesForColumn(column); track story.id) {
-                <app-user-story-card [story]="story" (openStory)="onOpenStory($event)"></app-user-story-card>
+                <app-user-story-card
+                    [story]="story"
+                    (openStory)="onOpenStory($event)"
+                    (deleteStory)="askDeleteStory($event)"
+                ></app-user-story-card>
             }
         </div>
     </div>
