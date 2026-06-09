@@ -1,4 +1,17 @@
-<article class="user-story-card" role="button" tabindex="0" (click)="onOpenStory()" (keyup.enter)="onOpenStory()" (keyup.space)="onOpenStory()">
-  <h3>{{ story.title }}</h3>
-  <p>{{ story.description }}</p>
+<article class="user-story-card">
+  <div
+      class="story-content"
+      role="button"
+      tabindex="0"
+      (click)="onOpenStory()"
+      (keyup.enter)="onOpenStory()"
+      (keyup.space)="onOpenStory()"
+  >
+      <h3>{{ story.title }}</h3>
+      <p>{{ story.description }}</p>
+  </div>
+
+  <button class="card-action-btn muted delete-btn" type="button" (click)="onDeleteStory($event)">
+      Delete
+  </button>
 </article>
